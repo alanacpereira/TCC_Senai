@@ -1,7 +1,7 @@
 <?php
 
-require_once __DIR__ . "/../models/Jogo.php";
-require_once __DIR__ . "/../models/Usuario.php";
+require_once __DIR__ . "/../models/jogo.php";
+require_once __DIR__ . "/../models/usuarip.php";
 
 
 class JogoController

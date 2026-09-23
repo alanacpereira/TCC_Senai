@@ -12,7 +12,7 @@ header(
 );
 
 
-require_once __DIR__ . "/../config/Database.php";
+require_once __DIR__ . "/../config/database.php";
 require_once __DIR__ . "/../controllers/JogoController.php";
 
 

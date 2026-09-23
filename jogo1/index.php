@@ -338,7 +338,7 @@ if (!$desafioId) {
         O JavaScript será criado no próximo passo.
     -->
 
-    <script src="js/jogo.js"></script>
+    <script src="js/jogo.js?v=2"></script>
 
 </body>
 
