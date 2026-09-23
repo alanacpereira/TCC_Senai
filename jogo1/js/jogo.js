@@ -190,8 +190,7 @@ botaoJogarNovamente.addEventListener(
 // INICIAR O JOGO
 // ============================================================
 
-async function iniciarJogo()
-{
+async function iniciarJogo() {
     /*
      * Desativa temporariamente o botão
      * para evitar dois pedidos ao mesmo tempo.
@@ -332,8 +331,7 @@ async function iniciarJogo()
 // CARREGAR PERGUNTA
 // ============================================================
 
-async function carregarPergunta()
-{
+async function carregarPergunta() {
     /*
      * Enquanto carregamos a pergunta,
      * o jogador não pode responder.
@@ -371,22 +369,21 @@ async function carregarPergunta()
             encodeURIComponent(numeroPerguntaAtual);
 
 
-        /*
-         * Faz o pedido para o PHP.
-         */
         const resposta = await fetch(url);
 
+        const textoResposta = await resposta.text();
 
-        /*
-         * Converte a resposta para JSON.
-         */
-        const resultadoAPI =
-            await resposta.json();
+        let resultadoAPI;
 
+        try {
+            resultadoAPI = JSON.parse(textoResposta);
+        } catch (erroJSON) {
+            console.error("Resposta recebida da API:", textoResposta);
 
-        /*
-         * Verifica erros.
-         */
+            throw new Error(
+                "A API retornou um erro. Veja o Console do navegador para saber qual é."
+            );
+        }
         if (!resposta.ok || !resultadoAPI.sucesso) {
 
             throw new Error(
@@ -423,8 +420,7 @@ async function carregarPergunta()
 // MOSTRAR PERGUNTA
 // ============================================================
 
-function mostrarPergunta(dados)
-{
+function mostrarPergunta(dados) {
     /*
      * Atualiza o número da pergunta.
      */
@@ -476,8 +472,7 @@ function mostrarPergunta(dados)
      * Cria um botão para cada alternativa.
      */
     dados.alternativas.forEach(
-        function (alternativa)
-        {
+        function (alternativa) {
             const botao =
                 document.createElement(
                     "button"
@@ -512,8 +507,7 @@ function mostrarPergunta(dados)
              */
             botao.addEventListener(
                 "click",
-                function ()
-                {
+                function () {
                     responderPergunta(
                         alternativa.id
                     );
@@ -544,8 +538,7 @@ function mostrarPergunta(dados)
 
 async function responderPergunta(
     alternativaId
-)
-{
+) {
     /*
      * Impede cliques duplicados.
      */
@@ -571,8 +564,7 @@ async function responderPergunta(
 
 
     botoes.forEach(
-        function (botao)
-        {
+        function (botao) {
             botao.disabled = true;
         }
     );
@@ -681,8 +673,7 @@ async function responderPergunta(
             if (dadosResposta.finalizou) {
 
                 setTimeout(
-                    function ()
-                    {
+                    function () {
                         mostrarResultado(
                             dadosResposta
                         );
@@ -698,8 +689,7 @@ async function responderPergunta(
              * Passa para a próxima pergunta.
              */
             setTimeout(
-                function ()
-                {
+                function () {
                     proximaPergunta();
                 },
                 800
@@ -733,8 +723,7 @@ async function responderPergunta(
          * tenha ocorrido um problema técnico.
          */
         botoes.forEach(
-            function (botao)
-            {
+            function (botao) {
                 botao.disabled = false;
             }
         );
@@ -751,8 +740,7 @@ async function responderPergunta(
 
 function mostrarExplicacao(
     dados
-)
-{
+) {
     /*
      * Mostra o que o jogador escolheu.
      */
@@ -826,8 +814,7 @@ function mostrarExplicacao(
 // CONTINUAR DEPOIS DA EXPLICAÇÃO
 // ============================================================
 
-function continuarJogo()
-{
+function continuarJogo() {
     /*
      * Esconde o cartão educativo.
      */
@@ -884,8 +871,7 @@ function continuarJogo()
 // PRÓXIMA PERGUNTA
 // ============================================================
 
-function proximaPergunta()
-{
+function proximaPergunta() {
     numeroPerguntaAtual++;
 
     carregarPergunta();
@@ -896,8 +882,7 @@ function proximaPergunta()
 // BUSCAR RESULTADO FINAL
 // ============================================================
 
-async function carregarResultadoFinal()
-{
+async function carregarResultadoFinal() {
     /*
      * Fazemos uma nova busca da tentativa
      * diretamente pelo banco através de uma API.
@@ -938,8 +923,7 @@ async function carregarResultadoFinal()
 
 function mostrarResultado(
     dados
-)
-{
+) {
     /*
      * Esconde as áreas que não são mais necessárias.
      */
