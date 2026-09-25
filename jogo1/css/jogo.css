@@ -1,0 +1,323 @@
+:root {
+    --bg-1: #0b1020;
+    --bg-2: #1b2540;
+    --painel: rgba(17, 24, 39, 0.95);
+    --painel-2: #f8fafc;
+    --card: #ffffff;
+    --azul: #4f8ef7;
+    --azul-escuro: #20478e;
+    --verde: #31c48d;
+    --verde-escuro: #1a8f67;
+    --laranja: #ff9f43;
+    --laranja-escuro: #d97706;
+    --vermelho: #ef4444;
+    --texto: #1f2937;
+    --texto-claro: #e2e8f0;
+    --cinza: #94a3b8;
+    --borda: rgba(148, 163, 184, 0.3);
+    --sombra: 0 18px 45px rgba(15, 23, 42, 0.35);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    min-height: 100%;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, var(--bg-1), var(--bg-2));
+    color: var(--texto);
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 18px;
+}
+
+#jogo {
+    width: min(980px, 100%);
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid var(--borda);
+    border-radius: 28px;
+    box-shadow: var(--sombra);
+    overflow: hidden;
+    backdrop-filter: blur(8px);
+}
+
+.cabecalho-jogo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 28px 36px 18px;
+    background: linear-gradient(180deg, rgba(77, 107, 181, 0.26), rgba(12, 18, 28, 0.18));
+    border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.informacao-jogo {
+    flex: 1;
+}
+
+.informacao-jogo h1 {
+    margin: 0 0 8px;
+    font-size: clamp(2rem, 3vw, 3rem);
+    line-height: 1.1;
+    color: #f8fbff;
+    letter-spacing: -0.04em;
+}
+
+.informacao-jogo p {
+    margin: 0;
+    font-size: 1.05rem;
+    color: rgba(226, 232, 240, 0.9);
+}
+
+.status-jogo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.status-jogo > div {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: var(--texto-claro);
+    border-radius: 999px;
+    padding: 10px 16px;
+    font-weight: 600;
+    min-height: 52px;
+}
+
+.status-jogo strong {
+    color: #fff;
+    font-size: 1.2rem;
+}
+
+#area-desafio,
+.tela-inicio,
+.resultado,
+.explicacao {
+    background: linear-gradient(180deg, rgba(248, 250, 252, 0.98), rgba(230, 237, 245, 0.98));
+    padding: 30px 36px 34px;
+}
+
+.progresso {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 20px;
+}
+
+#numero-pergunta {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--azul), var(--azul-escuro));
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    padding: 10px 18px;
+    border-radius: 999px;
+    box-shadow: 0 8px 22px rgba(79, 142, 247, 0.35);
+}
+
+.pergunta-container {
+    background: var(--card);
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    border-radius: 24px;
+    padding: 28px 28px 22px;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+#enunciado {
+    margin: 0 0 22px;
+    font-size: clamp(1.8rem, 2.3vw, 2.4rem);
+    line-height: 1.25;
+    color: var(--texto);
+}
+
+.alternativas {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(200px, 1fr));
+    gap: 18px;
+}
+
+.alternativa {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 76px;
+    padding: 18px 20px;
+    border: 2px solid rgba(148, 163, 184, 0.38);
+    border-radius: 18px;
+    background: linear-gradient(135deg, #ffffff, #f8fafc);
+    color: var(--texto);
+    font-size: 1.08rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
+}
+
+.alternativa:hover,
+.alternativa:focus-visible {
+    transform: translateY(-2px);
+    border-color: rgba(79, 142, 247, 0.7);
+    box-shadow: 0 12px 24px rgba(79, 142, 247, 0.14);
+    outline: none;
+}
+
+.alternativa:active {
+    transform: translateY(0);
+}
+
+.alternativa.correta {
+    background: linear-gradient(135deg, #dffaf1, #c8f5e2);
+    border-color: var(--verde);
+    color: var(--verde-escuro);
+}
+
+.alternativa.incorreta {
+    background: linear-gradient(135deg, #ffe6e6, #ffd7d7);
+    border-color: var(--vermelho);
+    color: #a21c1c;
+}
+
+#mensagem {
+    min-height: 28px;
+    margin: 26px 0 0;
+    font-weight: 700;
+    color: var(--azul-escuro);
+}
+
+.explicacao {
+    border-top: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.explicacao h2 {
+    margin: 0 0 18px;
+    color: var(--texto);
+    font-size: clamp(1.8rem, 2.4vw, 2.3rem);
+}
+
+.explicacao p {
+    margin: 0 0 10px;
+    font-size: 1.05rem;
+    color: var(--texto);
+}
+
+.explicacao .texto-explicacao {
+    margin-top: 20px;
+    background: rgba(79, 142, 247, 0.06);
+    border: 1px solid rgba(79, 142, 247, 0.18);
+    border-radius: 18px;
+    padding: 18px 20px;
+}
+
+.explicacao .texto-explicacao h3 {
+    margin: 0 0 10px;
+    color: var(--azul-escuro);
+    font-size: 1.2rem;
+}
+
+.explicacao .texto-explicacao p {
+    margin: 0;
+    line-height: 1.6;
+}
+
+.tela-inicio,
+.resultado {
+    text-align: center;
+}
+
+.tela-inicio h2,
+.resultado h2 {
+    margin: 0 0 16px;
+    font-size: clamp(2rem, 3vw, 2.8rem);
+    color: var(--texto);
+}
+
+.tela-inicio p,
+.resultado p {
+    margin: 0 0 16px;
+    font-size: 1.1rem;
+    color: #334155;
+}
+
+button {
+    appearance: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 14px;
+    font-weight: 800;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+button:hover,
+button:focus-visible {
+    transform: translateY(-2px);
+    outline: none;
+}
+
+#botao-iniciar,
+#botao-jogar-novamente,
+#botao-continuar {
+    background: linear-gradient(135deg, var(--laranja), var(--laranja-escuro));
+    color: #fff;
+    padding: 16px 28px;
+    font-size: 1.02rem;
+    box-shadow: 0 12px 20px rgba(217, 119, 6, 0.3);
+}
+
+#botao-continuar {
+    margin-top: 18px;
+}
+
+.resultado-pontos {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, rgba(49, 196, 141, 0.12), rgba(26, 143, 103, 0.06));
+    border: 1px solid rgba(26, 143, 103, 0.25);
+    border-radius: 999px;
+    padding: 12px 18px;
+    font-size: 1.06rem;
+    margin: 14px 0 18px;
+    color: var(--texto);
+}
+
+.resultado-pontos strong {
+    color: var(--verde-escuro);
+    font-size: 1.5rem;
+}
+
+@media (max-width: 720px) {
+    .cabecalho-jogo {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .status-jogo {
+        justify-content: flex-start;
+    }
+
+    .alternativas {
+        grid-template-columns: 1fr;
+    }
+
+    #area-desafio,
+    .tela-inicio,
+    .resultado,
+    .explicacao,
+    .cabecalho-jogo {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+}

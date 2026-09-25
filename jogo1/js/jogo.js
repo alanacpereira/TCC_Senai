@@ -141,6 +141,7 @@ async function carregarPergunta() {
         /*
          * Faz o pedido para o PHP.
          */
+        const resposta = await fetch(url);
         const resultadoAPI = await lerResposta(resposta);
         mostrarPergunta(resultadoAPI.dados);
 
