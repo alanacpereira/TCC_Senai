@@ -41,7 +41,7 @@ if (!$desafioId) {
     -->
     <link
         rel="stylesheet"
-        href="css/jogo.css"
+        href="css/jogo.css?v=13"
     >
 
 </head>
@@ -119,6 +119,17 @@ if (!$desafioId) {
             aria-live="polite"
         >
 
+            <button
+                type="button"
+                id="botao-voltar-inicio"
+                class="botao-voltar-inicio"
+                aria-label="Sair do jogo e abandonar a partida atual"
+                disabled
+            >
+                <span aria-hidden="true">←</span>
+                Sair do jogo
+            </button>
+
             <!--
                 Essas informações serão preenchidas
                 pelo JavaScript quando a partida começar.
@@ -126,33 +137,48 @@ if (!$desafioId) {
 
             <div class="progresso">
 
-                <span id="numero-pergunta">
-                    Pergunta 1 de 5
-                </span>
+                <div class="progresso-rotulo">
+                    <span id="numero-pergunta">
+                        Pergunta 1 de 10
+                    </span>
+                    <span class="progresso-legenda">
+                        RUMO AO TESOURO
+                    </span>
+                </div>
+
+                <div
+                    class="trilho-progresso"
+                    role="progressbar"
+                    aria-label="Progresso das perguntas"
+                    aria-valuemin="0"
+                    aria-valuemax="10"
+                    aria-valuenow="1"
+                >
+                    <span id="barra-progresso"></span>
+                </div>
 
             </div>
 
 
             <div class="pergunta-container">
 
-                <h2 id="enunciado">
+                <h2 id="enunciado" class="quadro-pergunta">
                     Carregando pergunta...
                 </h2>
 
+            </div>
 
-                <!--
-                    As alternativas serão criadas
-                    pelo JavaScript dentro deste elemento.
-                -->
+            <!--
+                As alternativas serão criadas
+                pelo JavaScript dentro deste elemento.
+            -->
 
-                <div
-                    id="alternativas"
-                    class="alternativas"
-                    role="group"
-                    aria-label="Alternativas da pergunta"
-                >
-                </div>
-
+            <div
+                id="alternativas"
+                class="alternativas"
+                role="group"
+                aria-label="Alternativas da pergunta"
+            >
             </div>
 
 
@@ -247,29 +273,45 @@ if (!$desafioId) {
 
         <section
             id="inicio"
-            class="tela-inicio"
+            class="tela-inicio painel-inicio"
         >
 
-            <h2>
-                Pronto para começar?
-            </h2>
+            <div class="arte-bau-inicio" aria-hidden="true">
+                <img src="css/img/baú.png" alt="">
+            </div>
 
-            <p>
-                Você terá 3 vidas para responder
-                5 perguntas.
-            </p>
+            <div class="conteudo-inicio">
+                <h2>
+                    Pronto para começar?
+                </h2>
 
-            <p>
-                Cada resposta correta vale
-                <strong>100 pontos</strong>.
-            </p>
+                <p>
+                    Você terá 3 vidas para responder
+                    10 perguntas.
+                </p>
 
-            <button
-                type="button"
-                id="botao-iniciar"
-            >
-                Começar desafio
-            </button>
+                <p>
+                    Cada resposta correta vale
+                    <strong>100 pontos</strong>.
+                </p>
+
+                <button
+                    type="button"
+                    id="botao-iniciar"
+                >
+                    Começar desafio
+                </button>
+
+                <button
+                    type="button"
+                    class="botao-voltar-inicio botao-sair-inicial"
+                    disabled
+                    title="O destino será configurado quando o menu principal estiver disponível."
+                    aria-label="Sair do jogo. O destino será configurado posteriormente."
+                >
+                    Sair do jogo
+                </button>
+            </div>
 
         </section>
 
@@ -307,12 +349,23 @@ if (!$desafioId) {
             </div>
 
 
-            <button
-                type="button"
-                id="botao-jogar-novamente"
-            >
-                Jogar novamente
-            </button>
+            <div class="resultado-acoes">
+
+                <button
+                    type="button"
+                    id="botao-jogar-novamente"
+                >
+                    Jogar novamente
+                </button>
+
+                <button
+                    type="button"
+                    id="botao-voltar-menu"
+                >
+                    Voltar ao menu inicial
+                </button>
+
+            </div>
 
         </section>
 
@@ -338,7 +391,7 @@ if (!$desafioId) {
         O JavaScript será criado no próximo passo.
     -->
 
-    <script src="js/jogo.js?v=3"></script>
+    <script src="js/jogo.js?v=8"></script>
 
 </body>
 

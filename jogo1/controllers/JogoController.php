@@ -51,12 +51,9 @@ class JogoController
         // Busca as perguntas desse desafio.
         $perguntas = $this->jogo->buscarPerguntas($desafioId);
 
-        /*
-         * O nosso desafio precisa ter 5 perguntas.
-         */
-        if (count($perguntas) < 5) {
+        if (count($perguntas) < 10) {
             throw new Exception(
-                "Este desafio ainda não possui 5 perguntas cadastradas."
+                "Este desafio ainda não possui 10 perguntas cadastradas."
             );
         }
 
@@ -188,27 +185,15 @@ class JogoController
         }
 
 
-        /*
-         * O número da pergunta começa em 1.
-         *
-         * Exemplo:
-         * número 1 → índice 0
-         * número 2 → índice 1
-         */
-        $indice = $numeroPergunta - 1;
-
-
-        if ($indice < 0 || $indice >= 5) {
-            throw new Exception("Número de pergunta inválido.");
-        }
-
-
-        /*
-         * Busca as 5 perguntas do desafio.
-         */
         $perguntas = $this->jogo->buscarPerguntas(
             $tentativa["desafio_id"]
         );
+        $totalPerguntas = count($perguntas);
+        $indice = $numeroPergunta - 1;
+
+        if ($indice < 0 || $indice >= $totalPerguntas) {
+            throw new Exception("Número de pergunta inválido.");
+        }
 
 
         if (!isset($perguntas[$indice])) {
@@ -244,7 +229,7 @@ class JogoController
             "pergunta" => $pergunta,
             "alternativas" => $alternativas,
             "numero" => $numeroPergunta,
-            "total" => 5,
+            "total" => $totalPerguntas,
             "vidas" => (int) $tentativa["vidas_restantes"],
             "pontuacao" => (int) $tentativa["pontuacao"]
         ];
@@ -496,15 +481,12 @@ class JogoController
         $totalRespondidas = (int) $resultado["total"];
 
 
-        /*
-         * A partida termina quando:
-         *
-         * 1. As 5 perguntas foram respondidas
-         * OU
-         * 2. O jogador ficou sem vidas.
-         */
+        $totalPerguntas = count(
+            $this->jogo->buscarPerguntas($tentativa["desafio_id"])
+        );
+
         $finalizou =
-            $totalRespondidas >= 5 ||
+            $totalRespondidas >= $totalPerguntas ||
             $vidasNovas <= 0;
 
 
@@ -512,13 +494,13 @@ class JogoController
          * O bônus de conclusão é de +200 pontos.
          *
          * Ele só é dado quando o jogador
-         * respondeu as 5 perguntas e ainda
+         * respondeu todas as perguntas e ainda
          * não ficou sem vidas.
          */
         $bonusConclusao = 0;
 
         if (
-            $totalRespondidas >= 5 &&
+            $totalRespondidas >= $totalPerguntas &&
             $vidasNovas > 0
         ) {
             $bonusConclusao = 200;
@@ -625,7 +607,7 @@ class JogoController
 
             "pergunta_atual" => $totalRespondidas,
 
-            "total_perguntas" => 5,
+            "total_perguntas" => $totalPerguntas,
 
             "finalizou" => $finalizou,
 

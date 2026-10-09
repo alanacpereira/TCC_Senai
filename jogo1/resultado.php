@@ -200,6 +200,11 @@ catch (Exception $e) {
         Resultado - Caça ao Erro
     </title>
 
+    <link
+        rel="stylesheet"
+        href="css/jogo.css"
+    >
+
 </head>
 
 <body>

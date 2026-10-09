@@ -147,10 +147,7 @@ class Jogo
 
 
     /*
-     * Busca as perguntas de um desafio.
-     *
-     * No nosso jogo, cada desafio terá
-     * 5 perguntas.
+     * Busca as 10 perguntas da partida em ordem.
      */
     public function buscarPerguntas($desafioId)
     {
@@ -163,7 +160,7 @@ class Jogo
                 FROM perguntas
                 WHERE desafio_id = :desafio_id
                 ORDER BY ordem ASC
-                LIMIT 5";
+                LIMIT 10";
 
         $stmt = $this->conn->prepare($sql);
 

@@ -1,0 +1,58 @@
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.5;
+}
+
+body.fonte-grande {
+    font-size: 1.15rem;
+}
+
+body.fonte-muito_grande {
+    font-size: 1.3rem;
+}
+
+body.alto-contraste {
+    color: #000;
+    background: #fff;
+}
+
+body.alto-contraste a,
+body.alto-contraste button {
+    color: #000;
+    outline-color: #000;
+}
+
+body.espacamento-ampliado {
+    line-height: 1.9;
+}
+
+body.texto-legivel {
+    letter-spacing: 0.04em;
+    word-spacing: 0.12em;
+}
+
+body.animacoes-reduzidas *,
+body.animacoes-reduzidas *::before,
+body.animacoes-reduzidas *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+}
+
+body.interativos-destacados a,
+body.interativos-destacados button,
+body.interativos-destacados input,
+body.interativos-destacados select {
+    outline: 3px solid currentColor;
+    outline-offset: 3px;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 3px solid #b35c00;
+    outline-offset: 3px;
+}

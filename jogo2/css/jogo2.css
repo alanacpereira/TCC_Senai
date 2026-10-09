@@ -1,0 +1,1360 @@
+:root {
+    color-scheme: light;
+    font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    --oceano-profundo: #073842;
+    --verde-petroleo: #0c4c50;
+    --verde-oceano: #17665f;
+    --dourado: #d5a548;
+    --dourado-claro: #f3d17f;
+    --areia: #f4e3bb;
+    --pergaminho: #faedcf;
+    --madeira: #714126;
+    --madeira-escura: #392219;
+    --tinta: #49321f;
+    --linha: #a47739;
+    --sombra: 0 10px 24px rgb(4 24 29 / 34%);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.jogo2-page {
+    min-width: 320px;
+    min-height: 100vh;
+    margin: 0;
+    padding: clamp(10px, 1.8vw, 24px);
+    overflow-x: hidden;
+    color: #fff4d5;
+    background-color: #087c95;
+    background-image:
+        linear-gradient(180deg, rgb(2 29 39 / 30%), rgb(2 29 39 / 22%)),
+        url("../img/fundo.jpg");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+#jogo2 {
+    width: min(100%, 1600px);
+    min-height: calc(100vh - clamp(20px, 3.6vw, 48px));
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(10px, 1.5vh, 17px);
+}
+
+#jogo2 [hidden] {
+    display: none !important;
+}
+
+#jogo2 button {
+    font: inherit;
+}
+
+#jogo2 .cabecalho {
+    position: relative;
+    z-index: 4;
+    min-height: 82px;
+    display: grid;
+    grid-template-columns: minmax(235px, 1fr) minmax(210px, 0.8fr) auto auto;
+    align-items: center;
+    gap: clamp(12px, 2vw, 25px);
+    padding: 10px clamp(14px, 2vw, 25px);
+    border: 3px solid #b68843;
+    border-radius: 17px;
+    background:
+        linear-gradient(180deg, rgb(15 76 77 / 97%), rgb(5 46 52 / 98%));
+    box-shadow:
+        inset 0 0 0 2px rgb(255 226 155 / 22%),
+        inset 0 -5px 0 rgb(38 25 17 / 38%),
+        0 5px 0 #3f2b1d,
+        var(--sombra);
+}
+
+#jogo2 .marca {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    color: inherit;
+    text-decoration: none;
+}
+
+#jogo2 .brasao {
+    flex: 0 0 auto;
+    width: 50px;
+    height: 50px;
+    display: grid;
+    place-items: center;
+    border: 2px solid var(--dourado-claro);
+    border-radius: 50%;
+    background:
+        radial-gradient(circle, #23665d 0 54%, #174641 56% 100%);
+    box-shadow: inset 0 0 0 3px rgb(27 30 24 / 33%), 0 2px 5px #071d20;
+    color: #ffe6a4;
+    font-size: 1.75rem;
+    text-shadow: 0 2px 3px #182c28;
+}
+
+#jogo2 .marca-texto {
+    min-width: 0;
+    display: grid;
+    gap: 3px;
+}
+
+#jogo2 .marca-nome {
+    color: #f5dfa8;
+    font-family: Georgia, "Trebuchet MS", serif;
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: 0.09em;
+}
+
+#jogo2 .marca-nome strong {
+    color: #fff2d2;
+}
+
+#jogo2 .marca-jogo {
+    color: #fff9e5;
+    font-size: clamp(0.68rem, 1vw, 0.82rem);
+    font-weight: 900;
+    letter-spacing: 0.08em;
+}
+
+#jogo2 .progresso-jogador {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+#jogo2 .nivel-jogador {
+    min-width: 80px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #fff1cb;
+    font-size: 0.75rem;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+#jogo2 .nivel-medalha {
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    border: 1px solid #f6d887;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #ddae51, #765025);
+    color: #fff1c5;
+    font-size: 1.1rem;
+}
+
+#jogo2 .experiencia-jogador {
+    min-width: 105px;
+    flex: 1;
+    display: grid;
+    gap: 4px;
+}
+
+#jogo2 .experiencia-rotulo {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    color: #e5d09d;
+    font-size: 0.62rem;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+}
+
+#jogo2 .experiencia-rotulo strong {
+    color: #fff2cb;
+}
+
+#jogo2 .trilho-experiencia {
+    height: 8px;
+    overflow: hidden;
+    border: 1px solid #deb969;
+    border-radius: 99px;
+    background: #142f30;
+    box-shadow: inset 0 1px 2px #07191a;
+}
+
+#jogo2 .trilho-experiencia span {
+    display: block;
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #b88a38, #f6d77d);
+    transition: width 250ms ease;
+}
+
+#jogo2 .xp-acumulada {
+    color: #d9d1b5;
+    font-size: 0.66rem;
+    font-weight: 700;
+}
+
+#jogo2 .status-partida {
+    display: flex;
+    gap: 7px;
+}
+
+#jogo2 .indicador {
+    display: grid;
+    grid-template-columns: auto auto;
+    align-items: center;
+    column-gap: 6px;
+    min-width: 76px;
+    padding: 7px 10px;
+    border: 1px solid #c99f4c;
+    border-radius: 11px;
+    background: linear-gradient(180deg, #16544f, #103b3c);
+    box-shadow: inset 0 1px 0 #ffe6a34f, 0 2px 3px #071d20;
+    color: #fff3d4;
+    font-size: 0.74rem;
+    font-weight: 800;
+}
+
+#jogo2 .indicador span:first-child {
+    grid-row: span 2;
+    font-size: 1.05rem;
+}
+
+#jogo2 .indicador strong {
+    color: #ffdfa0;
+    font-size: 0.95rem;
+}
+
+#jogo2 .botao-voltar,
+#jogo2 .botao-principal,
+#jogo2 .botao-secundario {
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 9px 15px;
+    border: 2px solid #e0bc68;
+    border-radius: 11px;
+    background: linear-gradient(180deg, #a67534, #734321);
+    box-shadow: inset 0 1px 0 #fff1b35c, 0 3px 0 #342117;
+    color: #fff5dc;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 900;
+    text-align: center;
+    text-shadow: 0 1px 2px #32190f;
+    transition: filter 160ms ease, transform 160ms ease;
+}
+
+#jogo2 .botao-voltar:hover,
+#jogo2 .botao-principal:hover:not(:disabled),
+#jogo2 .botao-secundario:hover:not(:disabled) {
+    filter: brightness(1.13);
+    transform: translateY(-2px);
+}
+
+#jogo2 .botao-principal:disabled,
+#jogo2 .botao-secundario:disabled {
+    cursor: not-allowed;
+    filter: grayscale(0.55);
+    opacity: 0.72;
+}
+
+#jogo2 button:focus-visible,
+#jogo2 a:focus-visible {
+    outline: 3px solid #fff1b8;
+    outline-offset: 3px;
+}
+
+#jogo2 .area-expedicao {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1.22fr) minmax(360px, 0.78fr);
+    align-items: stretch;
+    gap: clamp(12px, 1.8vw, 25px);
+}
+
+#jogo2 .mapa-missoes {
+    position: relative;
+    isolation: isolate;
+    min-width: 0;
+    min-height: clamp(550px, calc(100svh - 175px), 820px);
+    overflow: hidden;
+    border: 1px solid rgb(238 207 130 / 45%);
+    border-radius: 20px;
+    background: linear-gradient(180deg, rgb(6 62 68 / 3%), rgb(5 52 58 / 12%));
+    box-shadow: inset 0 0 45px rgb(6 38 35 / 23%), 0 6px 19px #061d2466;
+}
+
+#jogo2 .mapa-legenda {
+    position: absolute;
+    z-index: 2;
+    top: 16px;
+    left: 18px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 12px;
+    border: 1px solid #e2c477;
+    border-radius: 12px;
+    background: rgb(7 57 59 / 87%);
+    box-shadow: 0 3px 7px #071d26a1;
+}
+
+#jogo2 .selo-mapa {
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    border: 1px solid #f3d58a;
+    border-radius: 50%;
+    background: #966d32;
+    color: #fff0bb;
+}
+
+#jogo2 .mapa-legenda strong,
+#jogo2 .mapa-legenda small {
+    display: block;
+}
+
+#jogo2 .mapa-legenda strong {
+    color: #fff1c4;
+    font-family: Georgia, serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+}
+
+#jogo2 .mapa-legenda small {
+    margin-top: 2px;
+    color: #e9d9ad;
+    font-size: 0.68rem;
+}
+
+#jogo2 .rota-mapa {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+}
+
+#jogo2 .rota-mapa path {
+    fill: none;
+    stroke: #f0c35b;
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-dasharray: 1 15;
+    filter: drop-shadow(0 2px 2px #244440);
+    opacity: 0.9;
+}
+
+#jogo2 .lista-missoes {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    pointer-events: none;
+}
+
+#jogo2 .marcador-missao {
+    position: absolute;
+    width: clamp(82px, 9.4vw, 120px);
+    height: clamp(85px, 10vw, 128px);
+    display: grid;
+    justify-items: center;
+    align-content: start;
+    gap: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    pointer-events: auto;
+    transform: translate(-50%, -50%);
+    transition: filter 160ms ease, scale 160ms ease;
+}
+
+#jogo2 .marcador-missao:hover,
+#jogo2 .marcador-missao.selecionada {
+    z-index: 3;
+    filter: brightness(1.1) drop-shadow(0 0 8px #ffdb71);
+    scale: 1.07;
+}
+
+#jogo2 .arte-ilha {
+    position: absolute;
+    top: 34%;
+    left: 50%;
+    width: 94%;
+    height: 50%;
+    transform: translate(-50%, -15%);
+}
+
+#jogo2 .arte-ilha .solo-ilha {
+    position: absolute;
+    right: 2%;
+    bottom: 3%;
+    left: 2%;
+    height: 43%;
+    border: 2px solid #75522c;
+    border-radius: 48% 46% 40% 42%;
+    background:
+        radial-gradient(ellipse at 54% 17%, #fff1a8 0 6%, transparent 7%),
+        radial-gradient(ellipse at 24% 74%, #a96934 0 8%, transparent 9%),
+        linear-gradient(180deg, #e9c66f 0 52%, #b98443 53% 100%);
+    box-shadow: 0 5px 4px #073b3a99, inset 0 -5px 0 #79512d55;
+    transform: rotate(-4deg);
+}
+
+#jogo2 .arte-ilha .palmeira {
+    position: absolute;
+    bottom: 28%;
+    left: 44%;
+    width: 22%;
+    height: 66%;
+    overflow: visible;
+}
+
+#jogo2 .arte-ilha .palmeira path {
+    fill: #214d3b;
+    stroke: #593f27;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+#jogo2 .numero-ilha {
+    position: relative;
+    z-index: 2;
+    width: clamp(36px, 4vw, 47px);
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    border: 3px solid #fff1be;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #a97830, #684622);
+    box-shadow: 0 2px 0 #49321c, 0 0 0 2px #8e682f;
+    color: #fff3d1;
+    font-family: Georgia, serif;
+    font-size: clamp(1rem, 1.6vw, 1.35rem);
+    font-weight: 900;
+    text-shadow: 0 1px 2px #492c13;
+}
+
+#jogo2 .marcador-missao.atual .numero-ilha {
+    border-color: #fff4cb;
+    background: linear-gradient(145deg, #9cbd66, #41663c);
+    box-shadow: 0 2px 0 #24422c, 0 0 0 2px #c8d98a, 0 0 14px #c6f28a;
+}
+
+#jogo2 .marcador-missao.concluida .numero-ilha {
+    background: linear-gradient(145deg, #dabd66, #92722d);
+}
+
+#jogo2 .marcador-missao.bloqueada {
+    cursor: not-allowed;
+    filter: grayscale(0.72) brightness(0.72);
+}
+
+#jogo2 .nome-ilha {
+    position: relative;
+    z-index: 3;
+    max-width: 100%;
+    margin-top: auto;
+    padding: 4px 8px;
+    border: 1px solid #d4b569;
+    border-radius: 7px;
+    background: rgb(5 53 55 / 91%);
+    box-shadow: 0 2px 5px #0b2b2d;
+    color: #fff1c8;
+    font-size: clamp(0.58rem, 0.85vw, 0.72rem);
+    font-weight: 900;
+    line-height: 1.1;
+    text-align: center;
+    text-shadow: 0 1px 1px #142a22;
+}
+
+#jogo2 .selo-concluida {
+    position: absolute;
+    z-index: 4;
+    top: 0;
+    right: 4px;
+    width: 21px;
+    height: 21px;
+    display: grid;
+    place-items: center;
+    border: 1px solid #e4d68f;
+    border-radius: 50%;
+    background: #36704b;
+    color: #fff5cc;
+    font-size: 0.78rem;
+    font-weight: 900;
+}
+
+#jogo2 .marcador-missao[data-posicao="1"] { left: 14%; top: 25%; }
+#jogo2 .marcador-missao[data-posicao="2"] { left: 43%; top: 18%; }
+#jogo2 .marcador-missao[data-posicao="3"] { left: 78%; top: 27%; }
+#jogo2 .marcador-missao[data-posicao="4"] { left: 63%; top: 50%; }
+#jogo2 .marcador-missao[data-posicao="5"] { left: 25%; top: 58%; }
+#jogo2 .marcador-missao[data-posicao="6"] { left: 46%; top: 79%; }
+#jogo2 .marcador-missao[data-posicao="7"] { left: 82%; top: 76%; }
+
+#jogo2 .barquinho-mapa {
+    position: absolute;
+    z-index: 1;
+    bottom: 7%;
+    left: 6%;
+    width: clamp(50px, 7vw, 82px);
+    filter: drop-shadow(0 4px 3px #032e34a8);
+    transform: rotate(-6deg);
+    pointer-events: none;
+}
+
+#jogo2 .barquinho-mapa .vela {
+    fill: #f3dca9;
+    stroke: #664725;
+    stroke-width: 3;
+    stroke-linejoin: round;
+}
+
+#jogo2 .barquinho-mapa .vela-clara {
+    fill: #fff1c9;
+}
+
+#jogo2 .barquinho-mapa .mastro {
+    stroke: #53371f;
+    stroke-width: 4;
+    stroke-linecap: round;
+}
+
+#jogo2 .barquinho-mapa .casco {
+    fill: #704025;
+    stroke: #edc46a;
+    stroke-width: 3;
+    stroke-linejoin: round;
+}
+
+#jogo2 .barquinho-mapa .onda {
+    fill: none;
+    stroke: #b1e7d9;
+    stroke-width: 3;
+    stroke-linecap: round;
+}
+
+#jogo2 .mapa-nota {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    max-width: 75%;
+    margin: 0;
+    padding: 6px 12px;
+    border: 1px solid rgb(229 201 130 / 65%);
+    border-radius: 999px;
+    background: rgb(4 49 53 / 78%);
+    color: #fff0c8;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-align: center;
+    text-shadow: 0 1px 2px #12332d;
+    transform: translateX(-50%);
+}
+
+#jogo2 .painel-missao {
+    position: relative;
+    z-index: 2;
+    min-width: 0;
+    min-height: clamp(550px, calc(100svh - 175px), 820px);
+    display: flex;
+    overflow: hidden;
+    border: 5px solid #754a2a;
+    border-radius: 19px 23px 18px 21px;
+    background:
+        radial-gradient(ellipse at 50% 0, rgb(255 253 232 / 88%), transparent 58%),
+        linear-gradient(148deg, #fff3d4, #f0dfb9 58%, #e4cd9e);
+    box-shadow:
+        inset 0 0 0 2px #fff5dd,
+        inset 0 -6px 0 rgb(112 73 37 / 15%),
+        0 5px 0 #34251a,
+        0 13px 25px rgb(3 26 33 / 40%);
+    color: var(--tinta);
+}
+
+#jogo2 .painel-missao::before,
+#jogo2 .painel-missao::after {
+    position: absolute;
+    z-index: 1;
+    right: 9px;
+    left: 9px;
+    height: 3px;
+    content: "";
+    border-top: 1px solid #ac7d38;
+    border-bottom: 1px solid #f9e6b9;
+    opacity: 0.75;
+    pointer-events: none;
+}
+
+#jogo2 .painel-missao::before { top: 8px; }
+#jogo2 .painel-missao::after { bottom: 8px; }
+
+#jogo2 .painel-conteudo {
+    width: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(11px, 1.55vh, 17px);
+    padding: clamp(17px, 2vw, 27px);
+    overflow-y: auto;
+    scrollbar-color: #a77a39 #ead7ac;
+    scrollbar-width: thin;
+}
+
+#jogo2 .painel-cabecalho {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    margin: -4px -5px 0;
+    padding: 14px 15px;
+    border: 2px solid #b98a42;
+    border-radius: 12px;
+    background: linear-gradient(180deg, #176158, #0a4146);
+    box-shadow: inset 0 1px 0 #f5d78355, 0 3px 0 #5c3b20;
+    color: #fff4d4;
+}
+
+#jogo2 .icone-painel {
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border: 2px solid #edcf81;
+    border-radius: 50%;
+    background: #805c2e;
+    color: #fff1c1;
+    font-size: 1.3rem;
+    text-shadow: 0 2px 2px #382518;
+}
+
+#jogo2 .painel-cabecalho > div {
+    min-width: 0;
+}
+
+#jogo2 .painel-cabecalho .sobretitulo {
+    margin-bottom: 3px;
+    color: #f2cf78;
+    font-size: 0.63rem;
+}
+
+#jogo2 .painel-cabecalho h1 {
+    margin: 0;
+    color: #fff1c8;
+    font-family: Georgia, "Trebuchet MS", serif;
+    font-size: clamp(1.13rem, 1.8vw, 1.55rem);
+    line-height: 1.14;
+    overflow-wrap: anywhere;
+    text-shadow: 0 2px 2px #153832;
+}
+
+#jogo2 .painel-cabecalho p:last-child {
+    margin: 4px 0 0;
+    color: #f0e4c3;
+    font-size: 0.77rem;
+    line-height: 1.35;
+}
+
+#jogo2 .painel-mensagem {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    min-height: 60px;
+    padding: 11px 12px;
+    border: 1px dashed #b48b4d;
+    border-radius: 10px;
+    background: rgb(255 249 230 / 60%);
+}
+
+#jogo2 .estrela-decorativa {
+    color: #aa7932;
+    font-size: 1.1rem;
+}
+
+#jogo2 #mensagem-missoes {
+    margin: 0;
+    color: #62492c;
+    font-size: 0.88rem;
+    font-weight: 700;
+    line-height: 1.45;
+}
+
+#jogo2 .resumo-missao {
+    display: grid;
+    gap: 8px;
+    padding: 12px;
+    border: 1px solid #c49b5e;
+    border-radius: 11px;
+    background: #fffaed8c;
+}
+
+#jogo2 .resumo-linha {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    color: #765633;
+    font-size: 0.81rem;
+}
+
+#jogo2 .resumo-linha strong {
+    color: #45321f;
+    text-align: right;
+}
+
+#jogo2 .recompensa-missao {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px;
+    border: 1px solid #b68b48;
+    border-radius: 11px;
+    background:
+        linear-gradient(130deg, #f8e9c7, #ead4a4);
+    box-shadow: inset 0 1px 0 #fff9e6;
+}
+
+#jogo2 .bau-icone {
+    flex: 0 0 auto;
+    width: 35px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    border: 2px solid #6b431f;
+    border-radius: 6px 6px 9px 9px;
+    background: linear-gradient(180deg, #d4a24b 0 18%, #7b4925 19% 100%);
+    box-shadow: inset 0 0 0 2px #e5bd63, 0 2px 0 #553619;
+    color: #ffe8a5;
+    font-size: 1.15rem;
+    text-shadow: 0 1px 2px #352014;
+}
+
+#jogo2 .recompensa-info {
+    min-width: 0;
+    flex: 1;
+    display: grid;
+    gap: 3px;
+}
+
+#jogo2 .recompensa-info strong {
+    color: #533b24;
+    font-size: 0.81rem;
+}
+
+#jogo2 .recompensa-info > span {
+    color: #745638;
+    font-size: 0.71rem;
+    line-height: 1.35;
+}
+
+#jogo2 .recompensa-simbolo {
+    color: #a1722f;
+    font-size: 1.4rem;
+}
+
+#jogo2 .nota-seguranca {
+    margin: -6px 0 0;
+    color: #745f43;
+    font-size: 0.69rem;
+    line-height: 1.4;
+    text-align: center;
+}
+
+#jogo2 .painel-selecao .botao-principal {
+    width: 100%;
+    min-height: 48px;
+    margin-top: auto;
+    font-size: 0.94rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+#jogo2 .painel-jogo {
+    gap: clamp(9px, 1.2vh, 13px);
+}
+
+#jogo2 .painel-cabecalho-jogo {
+    padding: 11px 13px;
+}
+
+#jogo2 .progresso-pergunta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    color: #725329;
+    font-size: 0.7rem;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+}
+
+#jogo2 .marcadores-progresso {
+    display: flex;
+    gap: 5px;
+}
+
+#jogo2 .marcador-progresso {
+    width: 23px;
+    height: 7px;
+    border: 1px solid #a17b42;
+    border-radius: 99px;
+    background: #dfcca4;
+    transition: background 160ms ease, box-shadow 160ms ease;
+}
+
+#jogo2 .marcador-progresso.concluido {
+    border-color: #447358;
+    background: #47835b;
+}
+
+#jogo2 .marcador-progresso.atual {
+    border-color: #a0742d;
+    background: #e2b74d;
+    box-shadow: 0 0 5px #c08a32;
+}
+
+#jogo2 .quadro-pergunta {
+    position: relative;
+    min-height: 85px;
+    display: flex;
+    align-items: center;
+    padding: 14px 16px 14px 48px;
+    border: 2px solid #bd9655;
+    border-radius: 12px;
+    background:
+        radial-gradient(ellipse at 50% 0, #fff9e8, transparent 78%),
+        #f8edcf;
+    box-shadow: inset 0 0 0 2px #fff9e5, 0 3px 0 #977142;
+}
+
+#jogo2 .selo-pergunta {
+    position: absolute;
+    top: 50%;
+    left: 11px;
+    width: 27px;
+    height: 27px;
+    display: grid;
+    place-items: center;
+    border: 1px solid #b0894c;
+    border-radius: 50%;
+    background: #ead39b;
+    color: #714d23;
+    font-family: Georgia, serif;
+    font-weight: 900;
+    transform: translateY(-50%);
+}
+
+#jogo2 #enunciado {
+    width: 100%;
+    margin: 0;
+    color: #49321f;
+    font-family: Georgia, "Trebuchet MS", serif;
+    font-size: clamp(1rem, 1.45vw, 1.23rem);
+    line-height: 1.38;
+    overflow-wrap: anywhere;
+}
+
+#jogo2 .mensagem-jogo {
+    min-height: 1.2em;
+    margin: 0;
+    color: #655033;
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+#jogo2 .alternativas {
+    display: grid;
+    gap: 8px;
+}
+
+#jogo2 .alternativa {
+    width: 100%;
+    min-height: 44px;
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    padding: 7px 11px;
+    border: 2px solid #bd9b5c;
+    border-radius: 10px;
+    background: linear-gradient(180deg, #145954, #0b4146);
+    box-shadow: inset 0 1px 0 #cce1b940, 0 2px 0 #714a2a;
+    color: #fff7e3;
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 800;
+    line-height: 1.3;
+    text-align: left;
+    overflow-wrap: anywhere;
+    transition: background 150ms ease, border-color 150ms ease, transform 150ms ease;
+}
+
+#jogo2 .alternativa:hover:not(:disabled) {
+    border-color: #efce78;
+    background: linear-gradient(180deg, #1d6a60, #10504e);
+    transform: translateX(2px);
+}
+
+#jogo2 .alternativa:disabled {
+    cursor: default;
+}
+
+#jogo2 .alternativa.selecionada {
+    border-color: #ffe293;
+    background: linear-gradient(180deg, #237163, #14534d);
+    box-shadow: inset 0 0 0 1px #fff0bb80, 0 0 0 2px #ba8a3a, 0 3px 0 #674625;
+}
+
+#jogo2 .letra-alternativa {
+    width: 27px;
+    height: 27px;
+    display: grid;
+    place-items: center;
+    border: 1px solid #d6bd78;
+    border-radius: 50%;
+    background: #f1dfb3;
+    color: #4c3921;
+    font-family: Georgia, serif;
+    font-size: 0.8rem;
+    font-weight: 900;
+}
+
+#jogo2 .alternativa.correta {
+    border-color: #c8df91;
+    background: linear-gradient(180deg, #356d4c, #204e3e);
+}
+
+#jogo2 .alternativa.errada {
+    border-color: #e6a18a;
+    background: linear-gradient(180deg, #8f4638, #63322c);
+}
+
+#jogo2 .alternativa.correta .letra-alternativa {
+    background: #e4efbb;
+}
+
+#jogo2 .alternativa.errada .letra-alternativa {
+    background: #f4c6a9;
+}
+
+#jogo2 .feedback {
+    padding: 10px 12px;
+    border: 1px solid #b58b48;
+    border-radius: 10px;
+    background: #fff6df;
+    box-shadow: 0 2px 0 #9c7540;
+    color: #50371f;
+    font-size: 0.77rem;
+}
+
+#jogo2 .feedback h2 {
+    margin: 0 0 5px;
+    color: #2f6943;
+    font-family: Georgia, serif;
+    font-size: 1rem;
+}
+
+#jogo2 .feedback.errada h2 {
+    color: #8a3a2c;
+}
+
+#jogo2 .feedback p {
+    margin: 3px 0;
+    line-height: 1.35;
+}
+
+#jogo2 .explicacao {
+    margin-top: 6px;
+    padding: 7px 9px;
+    border-left: 3px solid #bd8a39;
+    border-radius: 5px;
+    background: #f3e4c2;
+}
+
+#jogo2 .explicacao p {
+    margin: 3px 0 0;
+}
+
+#jogo2 .painel-jogo #botao-responder,
+#jogo2 .painel-jogo #botao-continuar {
+    width: 100%;
+    min-height: 43px;
+    flex: 0 0 auto;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+#jogo2 .painel-jogo #botao-continuar {
+    background: linear-gradient(180deg, #22665b, #10443f);
+}
+
+#jogo2 .recompensa-jogo {
+    margin-top: auto;
+    padding: 8px 10px;
+}
+
+#jogo2 .recompensa-jogo .bau-icone {
+    width: 31px;
+    height: 29px;
+}
+
+#jogo2 .trilho-progresso-missao {
+    height: 7px;
+    margin-top: 3px;
+    overflow: hidden;
+    border: 1px solid #a68148;
+    border-radius: 99px;
+    background: #dfcfaa;
+}
+
+#jogo2 #barra-progresso-missao {
+    display: block;
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #548457, #95ad59);
+    transition: width 200ms ease;
+}
+
+#jogo2 .percentual-progresso {
+    color: #5b6e3c;
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+#jogo2 .resumo-resultado {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+#jogo2 .resumo-resultado div {
+    display: grid;
+    gap: 5px;
+    padding: 11px;
+    border: 1px solid #c09b5b;
+    border-radius: 10px;
+    background: #fff7e4a8;
+}
+
+#jogo2 .resumo-resultado span {
+    color: #775d3b;
+    font-size: 0.74rem;
+}
+
+#jogo2 .resumo-resultado strong {
+    color: #4b341f;
+    font-family: Georgia, serif;
+    font-size: 1.15rem;
+}
+
+#jogo2 .painel-resultado > .botao-principal,
+#jogo2 .painel-resultado > .botao-secundario {
+    width: 100%;
+    flex: 0 0 auto;
+}
+
+#jogo2 .painel-resultado > .botao-secundario {
+    background: linear-gradient(180deg, #14584f, #0a3d42);
+}
+
+#jogo2 .rodape {
+    flex: 0 0 auto;
+    color: #fff0c4;
+    font-size: 0.67rem;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-align: center;
+    text-shadow: 0 2px 4px #042b32;
+}
+
+#jogo2 .rodape span {
+    padding: 0 7px;
+    color: #efce7c;
+}
+
+@media (max-width: 1100px) {
+    #jogo2 .cabecalho {
+        grid-template-columns: minmax(220px, 1fr) minmax(185px, 0.8fr) auto;
+    }
+
+    #jogo2 .status-partida {
+        grid-column: 2;
+        grid-row: 2;
+    }
+
+    #jogo2 .botao-voltar {
+        grid-column: 3;
+        grid-row: 1;
+    }
+
+    #jogo2 .area-expedicao {
+        grid-template-columns: minmax(0, 1fr) minmax(330px, 0.82fr);
+    }
+}
+
+@media (max-width: 800px) {
+    .jogo2-page {
+        background-attachment: scroll;
+    }
+
+    #jogo2 .cabecalho {
+        grid-template-columns: minmax(0, 1fr) auto;
+        row-gap: 10px;
+    }
+
+    #jogo2 .marca {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    #jogo2 .progresso-jogador {
+        grid-column: 1;
+        grid-row: 2;
+        max-width: 390px;
+    }
+
+    #jogo2 .botao-voltar {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    #jogo2 .status-partida {
+        grid-column: 2;
+        grid-row: 2;
+        justify-content: flex-end;
+    }
+
+    #jogo2 .area-expedicao {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    #jogo2 .mapa-missoes {
+        min-height: clamp(480px, 72vw, 650px);
+    }
+
+    #jogo2 .painel-missao {
+        min-height: 520px;
+        max-height: 760px;
+    }
+
+    #jogo2 .painel-conteudo {
+        padding: clamp(18px, 4vw, 28px);
+    }
+
+    #jogo2 .marcador-missao {
+        width: clamp(82px, 12vw, 112px);
+        height: clamp(88px, 13vw, 124px);
+    }
+}
+
+@media (max-width: 520px) {
+    .jogo2-page {
+        padding: 8px;
+    }
+
+    #jogo2 {
+        gap: 9px;
+        min-height: calc(100vh - 16px);
+    }
+
+    #jogo2 .cabecalho {
+        padding: 9px;
+        gap: 8px;
+        border-radius: 13px;
+    }
+
+    #jogo2 .brasao {
+        width: 39px;
+        height: 39px;
+        font-size: 1.35rem;
+    }
+
+    #jogo2 .marca {
+        gap: 7px;
+    }
+
+    #jogo2 .marca-nome {
+        font-size: 0.76rem;
+    }
+
+    #jogo2 .marca-jogo {
+        max-width: 195px;
+        font-size: 0.59rem;
+        line-height: 1.2;
+    }
+
+    #jogo2 .progresso-jogador {
+        gap: 6px;
+    }
+
+    #jogo2 .nivel-jogador {
+        min-width: 68px;
+        font-size: 0.66rem;
+    }
+
+    #jogo2 .nivel-medalha {
+        width: 25px;
+        height: 25px;
+    }
+
+    #jogo2 .experiencia-rotulo {
+        font-size: 0.55rem;
+    }
+
+    #jogo2 .xp-acumulada {
+        font-size: 0.6rem;
+    }
+
+    #jogo2 .botao-voltar {
+        min-height: 36px;
+        padding: 6px 8px;
+        font-size: 0.68rem;
+    }
+
+    #jogo2 .status-partida {
+        gap: 4px;
+    }
+
+    #jogo2 .indicador {
+        min-width: 59px;
+        padding: 5px 6px;
+        column-gap: 4px;
+        font-size: 0.63rem;
+    }
+
+    #jogo2 .mapa-missoes {
+        min-height: 440px;
+        border-radius: 14px;
+    }
+
+    #jogo2 .mapa-legenda {
+        top: 10px;
+        left: 10px;
+        padding: 6px 8px;
+    }
+
+    #jogo2 .mapa-legenda strong {
+        font-size: 0.68rem;
+    }
+
+    #jogo2 .mapa-legenda small {
+        font-size: 0.61rem;
+    }
+
+    #jogo2 .marcador-missao {
+        width: 73px;
+        height: 80px;
+    }
+
+    #jogo2 .numero-ilha {
+        width: 34px;
+        border-width: 2px;
+    }
+
+    #jogo2 .nome-ilha {
+        padding: 3px 5px;
+        font-size: 0.55rem;
+    }
+
+    #jogo2 .arte-ilha {
+        top: 34%;
+        height: 47%;
+    }
+
+    #jogo2 .mapa-nota {
+        bottom: 9px;
+        max-width: 86%;
+        font-size: 0.62rem;
+    }
+
+    #jogo2 .barquinho-mapa {
+        bottom: 7%;
+        width: 45px;
+    }
+
+    #jogo2 .painel-missao {
+        min-height: 540px;
+        border-width: 4px;
+        border-radius: 15px;
+    }
+
+    #jogo2 .painel-conteudo {
+        gap: 12px;
+        padding: 16px 13px;
+    }
+
+    #jogo2 .painel-cabecalho {
+        gap: 9px;
+        padding: 11px 10px;
+    }
+
+    #jogo2 .icone-painel {
+        width: 34px;
+        height: 34px;
+        font-size: 1.1rem;
+    }
+
+    #jogo2 .painel-cabecalho h1 {
+        font-size: 1.12rem;
+    }
+
+    #jogo2 .alternativa {
+        min-height: 47px;
+        font-size: 0.85rem;
+    }
+
+    #jogo2 .recompensa-info strong {
+        font-size: 0.76rem;
+    }
+}
+
+@media (max-height: 730px) and (min-width: 801px) {
+    .jogo2-page {
+        background-attachment: scroll;
+    }
+
+    #jogo2 {
+        gap: 8px;
+    }
+
+    #jogo2 .cabecalho {
+        min-height: 68px;
+        padding-top: 7px;
+        padding-bottom: 7px;
+    }
+
+    #jogo2 .mapa-missoes,
+    #jogo2 .painel-missao {
+        min-height: 545px;
+    }
+
+    #jogo2 .painel-conteudo {
+        gap: 9px;
+        padding-top: 16px;
+        padding-bottom: 16px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #jogo2 *,
+    #jogo2 *::before,
+    #jogo2 *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+    }
+}

@@ -4,6 +4,8 @@ const telaInicio = document.getElementById("inicio");
 const telaResultado = document.getElementById("resultado");
 const botaoIniciar = document.getElementById("botao-iniciar");
 const botaoJogarNovamente = document.getElementById("botao-jogar-novamente");
+const botaoVoltarMenu = document.getElementById("botao-voltar-menu");
+const botaoVoltarInicio = document.getElementById("botao-voltar-inicio");
 const botaoContinuar = document.getElementById("botao-continuar");
 const alternativas = document.getElementById("alternativas");
 const enunciado = document.getElementById("enunciado");
@@ -12,12 +14,15 @@ const explicacao = document.getElementById("explicacao");
 const vidas = document.getElementById("vidas");
 const pontuacao = document.getElementById("pontuacao");
 const numeroPergunta = document.getElementById("numero-pergunta");
+const barraProgresso = document.getElementById("barra-progresso");
+const trilhoProgresso = document.querySelector(".trilho-progresso");
 
 let desafioId = Number(dadosJogo.dataset.desafio);
 let tentativaId = null;
 let perguntaAtual = null;
 let numeroPerguntaAtual = 1;
 let podeResponder = false;
+let contextoAudio = null;
 
 function mostrarTela(tela) {
     telaInicio.hidden = tela !== telaInicio;
@@ -82,6 +87,10 @@ async function iniciarDesafio() {
 function mostrarPergunta(dados) {
     perguntaAtual = dados;
     numeroPergunta.textContent = `Pergunta ${dados.numero} de ${dados.total}`;
+    const percentualProgresso = Math.min(100, Math.max(0, (dados.numero / dados.total) * 100));
+    barraProgresso.style.width = `${percentualProgresso}%`;
+    trilhoProgresso.setAttribute("aria-valuemax", String(dados.total));
+    trilhoProgresso.setAttribute("aria-valuenow", String(dados.numero));
     enunciado.textContent = dados.pergunta.enunciado;
     vidas.textContent = dados.vidas;
     pontuacao.textContent = dados.pontuacao;
@@ -91,13 +100,19 @@ function mostrarPergunta(dados) {
         const botao = document.createElement("button");
         botao.type = "button";
         botao.className = "alternativa";
-        botao.textContent = alternativa.texto;
+        botao.dataset.alternativaId = String(alternativa.id);
+        const rotulo = document.createElement("span");
+        rotulo.className = "alternativa-texto";
+        rotulo.textContent = alternativa.texto;
+        botao.appendChild(rotulo);
         botao.addEventListener("click", () => responderPergunta(alternativa.id));
         alternativas.appendChild(botao);
     });
 
     podeResponder = true;
+    botaoVoltarInicio.disabled = false;
     mensagem.textContent = "Escolha uma alternativa.";
+    mensagem.classList.remove("feedback-correta", "feedback-errada");
 }
 
 async function carregarPergunta() {
@@ -106,6 +121,7 @@ async function carregarPergunta() {
      * o jogador não pode responder.
      */
     podeResponder = false;
+    botaoVoltarInicio.disabled = true;
 
 
     /*
@@ -146,7 +162,7 @@ async function carregarPergunta() {
         mostrarPergunta(resultadoAPI.dados);
 
     } catch (erro) {
-
+        botaoVoltarInicio.disabled = false;
         /*
          * Mostra o erro.
          */
@@ -160,6 +176,8 @@ async function responderPergunta(alternativaId) {
     }
 
     podeResponder = false;
+    botaoVoltarInicio.disabled = true;
+    prepararAudio();
     mensagem.textContent = "Registrando resposta...";
 
     try {
@@ -179,6 +197,7 @@ async function responderPergunta(alternativaId) {
         mostrarResultadoResposta(resultado.dados);
     } catch (erro) {
         podeResponder = true;
+        botaoVoltarInicio.disabled = false;
         mostrarErro(erro);
     }
 }
@@ -194,22 +213,113 @@ function mostrarResultadoResposta(resultado) {
         document.getElementById("resposta-correta").textContent = textoCorreto;
         document.getElementById("texto-explicacao").textContent = resultado.explicacao;
         explicacao.hidden = false;
+        mensagem.textContent = "Resposta errada.";
+        mensagem.classList.remove("feedback-correta");
+        mensagem.classList.add("feedback-errada");
     } else {
         document.getElementById("resposta-escolhida").textContent = textoEscolhido;
         document.getElementById("resposta-correta").textContent = textoCorreto;
         document.getElementById("texto-explicacao").textContent = resultado.explicacao || "Muito bem!";
         explicacao.hidden = false;
         mensagem.textContent = "Resposta correta!";
+        mensagem.classList.remove("feedback-errada");
+        mensagem.classList.add("feedback-correta");
     }
 
+    marcarAlternativas(resultado);
+    tocarFeedback(resultado.correta);
+
     if (resultado.finalizou) {
+        botaoContinuar.hidden = true;
         mostrarResultadoFinal(resultado);
-    } else if (resultado.correta) {
+    } else {
+        botaoVoltarInicio.disabled = false;
         botaoContinuar.hidden = false;
     }
 }
 
+function marcarAlternativas(resultado) {
+    const botoes = alternativas.querySelectorAll(".alternativa");
+    const alternativaEscolhida = resultado.alternativa_escolhida;
+    const alternativaCorreta = resultado.alternativa_correta;
+
+    botoes.forEach((botao) => {
+        const id = botao.dataset.alternativaId;
+        const escolhida = alternativaEscolhida
+            ? (alternativaEscolhida.id !== undefined
+                ? id === String(alternativaEscolhida.id)
+                : botao.textContent === alternativaEscolhida.texto)
+            : false;
+        const correta = resultado.correta && escolhida
+            ? true
+            : alternativaCorreta
+                ? (alternativaCorreta.id !== undefined
+                    ? id === String(alternativaCorreta.id)
+                    : botao.textContent === alternativaCorreta.texto)
+                : false;
+
+        botao.disabled = true;
+        botao.setAttribute("aria-pressed", String(escolhida));
+        botao.setAttribute("data-correta", String(correta));
+
+        if (escolhida && !correta) {
+            botao.classList.add("wrong");
+        } else if (correta) {
+            botao.classList.add("correct");
+        }
+    });
+}
+
+function prepararAudio() {
+    const AudioContextAtual = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextAtual) {
+        return;
+    }
+
+    if (!contextoAudio) {
+        contextoAudio = new AudioContextAtual();
+    }
+
+    if (contextoAudio.state === "suspended") {
+        contextoAudio.resume().catch((erro) => {
+            console.error("Não foi possível iniciar o áudio de feedback:", erro);
+        });
+    }
+}
+
+function tocarFeedback(correta) {
+    if (!contextoAudio || contextoAudio.state !== "running") {
+        return;
+    }
+
+    const agora = contextoAudio.currentTime;
+    const notas = correta
+        ? [{ frequencia: 660, inicio: 0 }, { frequencia: 880, inicio: 0.14 }]
+        : [{ frequencia: 310, inicio: 0 }, { frequencia: 220, inicio: 0.16 }];
+
+    notas.forEach(({ frequencia, inicio }) => {
+        const oscilador = contextoAudio.createOscillator();
+        const volume = contextoAudio.createGain();
+        const inicioNota = agora + inicio;
+        const fimNota = inicioNota + 0.13;
+
+        oscilador.type = "triangle";
+        oscilador.frequency.setValueAtTime(frequencia, inicioNota);
+        volume.gain.setValueAtTime(0.0001, inicioNota);
+        volume.gain.exponentialRampToValueAtTime(0.12, inicioNota + 0.015);
+        volume.gain.exponentialRampToValueAtTime(0.0001, fimNota);
+        oscilador.connect(volume);
+        volume.connect(contextoAudio.destination);
+        oscilador.start(inicioNota);
+        oscilador.stop(fimNota);
+    });
+}
+
 function continuarJogo() {
+    if (botaoContinuar.hidden || !perguntaAtual) {
+        return;
+    }
+
     explicacao.hidden = true;
     botaoContinuar.hidden = true;
     numeroPerguntaAtual += 1;
@@ -217,6 +327,8 @@ function continuarJogo() {
 }
 
 function mostrarResultadoFinal(resultado) {
+    explicacao.hidden = true;
+    botaoContinuar.hidden = true;
     document.getElementById("pontuacao-final").textContent = resultado.pontuacao;
     document.getElementById("mensagem-resultado").textContent = resultado.venceu
         ? "Parabéns! Você concluiu o desafio."
@@ -224,8 +336,33 @@ function mostrarResultadoFinal(resultado) {
     mostrarTela(telaResultado);
 }
 
+function voltarAoMenu() {
+    botaoIniciar.disabled = false;
+    explicacao.hidden = true;
+    botaoContinuar.hidden = true;
+    mostrarTela(telaInicio);
+}
+
+function voltarAoInicio() {
+    if (
+        tentativaId &&
+        !window.confirm("Se sair do jogo, a partida atual será abandonada. Deseja continuar?")
+    ) {
+        return;
+    }
+
+    podeResponder = false;
+    botaoVoltarInicio.disabled = true;
+    botaoIniciar.disabled = false;
+    explicacao.hidden = true;
+    botaoContinuar.hidden = true;
+    mostrarTela(telaInicio);
+}
+
 botaoIniciar.addEventListener("click", iniciarDesafio);
 botaoJogarNovamente.addEventListener("click", iniciarDesafio);
 botaoContinuar.addEventListener("click", continuarJogo);
+botaoVoltarMenu.addEventListener("click", voltarAoMenu);
+botaoVoltarInicio.addEventListener("click", voltarAoInicio);
 
 mostrarTela(telaInicio);

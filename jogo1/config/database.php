@@ -3,10 +3,11 @@
 class Database
 {
     // Dados de acesso ao banco
-    private $host = "localhost: 3306";
-    private $db_name = "palavra_a_bordo1";
+    private $host = "localhost";
+    private $port = 3308;
+    private $db_name = "palavra_a_bordo";
     private $username = "root";
-    private $password = "mysql";
+    private $password = "";
     
 
     // Guarda a conexão com o banco
@@ -21,6 +22,7 @@ class Database
 
             $this->conn = new PDO(
                 "mysql:host=" . $this->host .
+                ";port=" . $this->port .
                 ";dbname=" . $this->db_name .
                 ";charset=utf8mb4",
 
