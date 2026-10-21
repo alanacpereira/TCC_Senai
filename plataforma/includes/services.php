@@ -5,7 +5,7 @@ declare(strict_types=1);
 function plataforma_preferencias(PDO $pdo, int $usuarioId): array
 {
     $stmt = $pdo->prepare(
-        "SELECT acessibilidade_visual, tamanho_fonte, alto_contraste,
+        "SELECT configurada, acessibilidade_visual, tamanho_fonte, alto_contraste,
                 espacamento_linhas, melhor_legibilidade, reduzir_animacoes,
                 destacar_interativos
          FROM preferencias_acessibilidade
@@ -15,7 +15,8 @@ function plataforma_preferencias(PDO $pdo, int $usuarioId): array
     $stmt->execute(["usuario_id" => $usuarioId]);
     $preferencias = $stmt->fetch();
 
-    return $preferencias ?: [
+    $preferenciasPadrao = [
+        "configurada" => 0,
         "acessibilidade_visual" => 0,
         "tamanho_fonte" => "padrao",
         "alto_contraste" => 0,
@@ -24,6 +25,71 @@ function plataforma_preferencias(PDO $pdo, int $usuarioId): array
         "reduzir_animacoes" => 0,
         "destacar_interativos" => 0
     ];
+    if (
+        !$preferencias
+        || empty($preferencias["configurada"])
+        || empty($preferencias["acessibilidade_visual"])
+    ) {
+        $preferenciasPadrao["configurada"] = (int) !empty($preferencias["configurada"]);
+        return $preferenciasPadrao;
+    }
+
+    return $preferencias;
+}
+
+function plataforma_exigir_aluno(PDO $pdo, string $urlLogin): array
+{
+    $usuario = plataforma_usuario($pdo);
+
+    if (!$usuario || $usuario["perfil"] === "convidado") {
+        header("Location: " . $urlLogin);
+        exit;
+    }
+
+    if ($usuario["perfil"] !== "aluno") {
+        http_response_code(403);
+        exit("Esta área é exclusiva para jogadores.");
+    }
+
+    return $usuario;
+}
+
+function plataforma_exigir_aluno_api(PDO $pdo): int
+{
+    plataforma_sessao();
+    $usuarioId = Auth::usuarioId();
+
+    if ($usuarioId === null) {
+        plataforma_responder_erro_api(401, "Entre na sua conta para continuar.");
+    }
+
+    $stmt = $pdo->prepare(
+        "SELECT perfil FROM usuarios WHERE id = :id LIMIT 1"
+    );
+    $stmt->execute(["id" => $usuarioId]);
+    $perfil = $stmt->fetchColumn();
+
+    if ($perfil === false || $perfil === "convidado") {
+        plataforma_responder_erro_api(401, "Sua sessão expirou. Entre novamente.");
+    }
+
+    if ($perfil !== "aluno") {
+        plataforma_responder_erro_api(403, "Esta área é exclusiva para jogadores.");
+    }
+
+    return $usuarioId;
+}
+
+function plataforma_responder_erro_api(int $status, string $mensagem): never
+{
+    http_response_code($status);
+    header("Content-Type: application/json; charset=UTF-8");
+    header("Cache-Control: no-store");
+    echo json_encode(
+        ["sucesso" => false, "mensagem" => $mensagem],
+        JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+    );
+    exit;
 }
 
 function plataforma_sincronizar_carteira(PDO $pdo, int $usuarioId): void

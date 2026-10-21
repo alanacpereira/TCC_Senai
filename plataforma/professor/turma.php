@@ -99,6 +99,7 @@ $categorias = $stmt->fetchAll();
 
 plataforma_cabecalho("Relatório da turma", $professor);
 ?>
+<div class="pagina-centralizada pagina-relatorio-turma">
 <h1><?= plataforma_escapar($turma["nome"]) ?></h1>
 <p>Código de entrada: <?= plataforma_escapar($turma["codigo"]) ?></p>
 <?php if (!$alunos): ?>
@@ -106,7 +107,7 @@ plataforma_cabecalho("Relatório da turma", $professor);
 <?php else: ?>
     <table>
         <thead>
-            <tr><th scope="col">Estudante</th><th scope="col">Nível</th><th scope="col">XP</th><th scope="col">Tentativas</th><th scope="col">Concluídas</th><th scope="col">Acertos</th><th scope="col">Pontos</th><th scope="col">Atividade recente</th></tr>
+            <tr><th scope="col">Estudante</th><th scope="col">Nível</th><th scope="col">XP</th><th scope="col">Tentativas</th><th scope="col">Concluídas</th><th scope="col">Acertos</th><th scope="col">Pontos</th><th scope="col">Atividade recente</th><th scope="col">Relatório</th></tr>
         </thead>
         <tbody>
         <?php foreach ($alunos as $aluno): ?>
@@ -119,6 +120,7 @@ plataforma_cabecalho("Relatório da turma", $professor);
                 <td><?= (int) $aluno["acertos"] ?></td>
                 <td><?= (int) $aluno["pontos"] ?></td>
                 <td><?= plataforma_escapar($aluno["atividade_recente"] ?? "Sem atividade") ?></td>
+                <td><a href="aluno.php?id=<?= (int) $aluno["id"] ?>">Ver detalhes</a></td>
             </tr>
         <?php endforeach; ?>
         </tbody>
@@ -146,4 +148,5 @@ plataforma_cabecalho("Relatório da turma", $professor);
         </table>
     <?php endif; ?>
 </section>
+</div>
 <?php plataforma_rodape(); ?>

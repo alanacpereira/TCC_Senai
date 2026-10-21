@@ -25,7 +25,8 @@ $conquistas = $stmt->fetchAll();
 
 plataforma_cabecalho("Conquistas", $usuario);
 ?>
-<h1>Conquistas</h1>
+<section class="pagina-centralizada pagina-conquistas" aria-labelledby="titulo-conquistas">
+<h1 id="titulo-conquistas">Conquistas</h1>
 <?php if (!$conquistas): ?>
     <p>Ainda não há conquistas cadastradas.</p>
 <?php else: ?>
@@ -44,4 +45,5 @@ plataforma_cabecalho("Conquistas", $usuario);
         <?php endforeach; ?>
     </ul>
 <?php endif; ?>
+</section>
 <?php plataforma_rodape(); ?>

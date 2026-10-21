@@ -1,7 +1,13 @@
 <?php
 
 require_once __DIR__ . "/../jogo1/config/Auth.php";
+require_once __DIR__ . "/../plataforma/config/app.php";
+require_once __DIR__ . "/../plataforma/includes/services.php";
+require_once __DIR__ . "/../plataforma/includes/layout.php";
+$pdo = plataforma_conexao();
+$usuario = plataforma_exigir_aluno($pdo, "../plataforma/login.php");
 Auth::iniciarSessao();
+$csrfAcessibilidade = plataforma_token_csrf();
 
 if (
     !isset($_SESSION["jogo2_csrf"]) ||
@@ -18,11 +24,19 @@ if (
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#073d48">
     <title>Expedição dos Sete Mares — Palavra a Bordo</title>
-    <link rel="stylesheet" href="css/jogo2.css?v=2">
+    <?php plataforma_acessibilidade_bootstrap(true, $usuario["preferencias"] ?? []); ?>
+    <link rel="stylesheet" href="../plataforma/css/acessibilidade.css?v=12">
+    <link rel="stylesheet" href="css/jogo2.css?v=3">
+    <script src="../plataforma/js/acessibilidade.js?v=3" defer></script>
     <script src="js/jogo2.js?v=2" defer></script>
 </head>
 <body class="jogo2-page">
+    <?php plataforma_widget_acessibilidade(
+        "../plataforma/api/preferencias-acessibilidade.php",
+        $csrfAcessibilidade
+    ); ?>
     <main id="jogo2" data-csrf="<?= htmlspecialchars($_SESSION["jogo2_csrf"], ENT_QUOTES, "UTF-8") ?>">
+        <?php plataforma_convite_acessibilidade(); ?>
         <header class="cabecalho">
             <a class="marca" href="index.php" aria-label="Palavra a Bordo, mapa das missões">
                 <span class="brasao" aria-hidden="true">⚓</span>
@@ -119,10 +133,9 @@ if (
                     <button type="button" id="botao-iniciar-missao" class="botao-principal" disabled>Escolha uma ilha no mapa</button>
                     <button
                         type="button"
+                        id="botao-sair-inicial"
                         class="botao-secundario botao-sair-inicial"
-                        disabled
-                        title="O destino será configurado quando o menu principal estiver disponível."
-                        aria-label="Sair do jogo. O destino será configurado posteriormente."
+                        aria-label="Sair do jogo e voltar para a plataforma"
                     >Sair do jogo</button>
                     <p class="nota-seguranca">3 vidas · 100 pontos por acerto · bônus de 200 pontos ao concluir</p>
                 </section>
@@ -199,5 +212,9 @@ if (
 
         <footer class="rodape">UMA AVENTURA DE LÍNGUA PORTUGUESA <span aria-hidden="true">✦</span> NAVEGUE E APRENDA</footer>
     </main>
+    <?php plataforma_widget_acessibilidade(
+        "../plataforma/api/preferencias-acessibilidade.php",
+        $csrfAcessibilidade
+    ); ?>
 </body>
 </html>

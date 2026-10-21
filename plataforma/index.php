@@ -3,51 +3,75 @@
 declare(strict_types=1);
 
 require_once __DIR__ . "/config/app.php";
-require_once __DIR__ . "/includes/services.php";
 require_once __DIR__ . "/includes/layout.php";
+
+$usuario = null;
+$erroBanco = false;
 
 try {
     $pdo = plataforma_conexao();
-    $pronta = plataforma_migracao_aplicada($pdo);
-    $usuario = $pronta ? plataforma_usuario($pdo) : null;
+    if (plataforma_migracao_aplicada($pdo)) {
+        $usuario = plataforma_usuario($pdo);
+        if ($usuario && $usuario["perfil"] === "convidado") {
+            $usuario = null;
+        }
+    }
 } catch (Throwable $erro) {
-    error_log("[Plataforma] Não foi possível carregar a página inicial: " . $erro->getMessage());
-    http_response_code(503);
-    $pronta = false;
-    $usuario = null;
+    error_log("[Plataforma] Não foi possível identificar o usuário na página pública: " . $erro->getMessage());
     $erroBanco = true;
 }
 
 plataforma_cabecalho("Início", $usuario);
 ?>
-<h1>Palavra a Bordo</h1>
-<p>Uma plataforma educacional para acompanhar sua jornada pelos jogos de Língua Portuguesa.</p>
-
-<?php if (!empty($erroBanco)): ?>
-    <section aria-labelledby="banco-indisponivel">
-        <h2 id="banco-indisponivel">Banco de dados indisponível</h2>
-        <p>Não foi possível conectar ao banco. Confira as variáveis de ambiente da conexão e tente novamente.</p>
+<div class="pagina-inicial">
+    <section class="hero-inicial" aria-labelledby="titulo-inicial">
+        <div class="hero-conteudo">
+            <p class="sobretitulo">Uma aventura de Língua Portuguesa</p>
+            <?php if ($usuario && $usuario["perfil"] === "aluno"): ?>
+                <h1 id="titulo-inicial">Bem-vindo a bordo!</h1>
+                <p>Entre na sua área de jogador para acompanhar sua jornada e acessar os desafios.</p>
+                <a class="botao-plataforma botao-dourado" href="inicio.php">Acessar minha área</a>
+            <?php elseif ($usuario && $usuario["perfil"] === "professor"): ?>
+                <h1 id="titulo-inicial">Sua tripulação aprende melhor com você.</h1>
+                <p>Acompanhe as turmas vinculadas à sua conta e consulte os resultados dos estudantes.</p>
+                <a class="botao-plataforma botao-dourado" href="professor/index.php">Acessar painel do professor</a>
+            <?php else: ?>
+                <h1 id="titulo-inicial">Aprender também pode ser uma grande aventura.</h1>
+                <p>Navegue por desafios de Língua Portuguesa e construa sua própria jornada de aprendizagem.</p>
+                <div class="acoes-hero">
+                    <a class="botao-plataforma botao-dourado" href="cadastro.php">Começar como jogador</a>
+                    <a class="botao-plataforma botao-contorno" href="login.php">Já tenho uma conta</a>
+                </div>
+            <?php endif; ?>
+        </div>
     </section>
-<?php elseif (!$pronta): ?>
-    <section aria-labelledby="migracao-pendente">
-        <h2 id="migracao-pendente">Configuração da plataforma pendente</h2>
-        <p>Os Jogos 1 e 2 e seus dados existentes foram preservados. As páginas da plataforma dependem das estruturas aditivas descritas na migração abaixo.</p>
-        <p><a href="database/migrations/001_plataforma_palavra_a_bordo.sql">Consultar a migração SQL</a></p>
-        <p>O sistema não executa essa migração automaticamente. Revise-a, faça um backup do banco e aplique-a manualmente quando estiver autorizada.</p>
-        <p>Consulte <a href="README.md">as instruções da plataforma</a>.</p>
-    </section>
-<?php elseif ($usuario && $usuario["perfil"] !== "convidado"): ?>
-    <p><a href="inicio.php">Abrir minha plataforma</a></p>
-<?php else: ?>
-    <p><a href="login.php">Entrar</a></p>
-    <p><a href="cadastro.php">Criar conta de estudante</a></p>
-<?php endif; ?>
 
-<section aria-labelledby="jogos-disponiveis">
-    <h2 id="jogos-disponiveis">Jogos existentes</h2>
-    <ul>
-        <li><a href="../jogo1/index.php?desafio=1">Jogo 1 — Caça ao Erro</a></li>
-        <li><a href="../jogo2/index.php">Jogo 2 — Expedição dos Sete Mares</a></li>
-    </ul>
-</section>
+    <?php if ($erroBanco): ?>
+        <p class="aviso-plataforma" role="status">Não foi possível consultar sua sessão agora. Você ainda pode entrar na plataforma.</p>
+    <?php endif; ?>
+
+    <section class="cards-perfil" aria-label="Acesso para jogadores e professores">
+        <article class="card-papel card-jogador">
+            <span class="selo-card" aria-hidden="true">✦</span>
+            <h2>Área do jogador</h2>
+            <p>Acompanhe seu progresso, suas conquistas e os desafios disponíveis para sua conta.</p>
+            <a class="botao-plataforma" href="<?= $usuario && $usuario["perfil"] === "aluno" ? "inicio.php" : "login.php" ?>">Entrar como jogador</a>
+        </article>
+        <article class="card-papel card-professor">
+            <span class="selo-card" aria-hidden="true">⚓</span>
+            <h2>Área do professor</h2>
+            <p>Acesse o painel para acompanhar suas turmas e consultar o progresso dos estudantes.</p>
+            <div class="acoes-professor<?= $usuario ? " acoes-professor-unica" : "" ?>" role="group" aria-label="Ações da área do professor">
+                <a class="botao-plataforma" href="<?= $usuario && $usuario["perfil"] === "professor" ? "professor/index.php" : "login.php?perfil=professor" ?>">
+                    <?= $usuario && $usuario["perfil"] === "professor" ? "Acessar painel do professor" : "Entrar como professor" ?>
+                </a>
+                <?php if (!$usuario): ?>
+                    <a class="link-cadastro-professor" href="cadastro.php?perfil=professor" aria-label="Criar conta para professores">
+                        Criar conta
+                    </a>
+                <?php endif; ?>
+            </div>
+        </article>
+    </section>
+</div>
 <?php plataforma_rodape(); ?>

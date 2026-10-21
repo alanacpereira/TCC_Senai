@@ -69,11 +69,37 @@ function jogo2UsuarioId(): int
 {
     $usuarioId = Auth::usuarioId();
 
-    if ($usuarioId !== null) {
-        return $usuarioId;
+    if ($usuarioId === null) {
+        throw new Jogo2HttpException(
+            "Entre na sua conta para continuar.",
+            401
+        );
     }
 
-    return 1;
+    static $perfilValidado = null;
+    if ($perfilValidado === null) {
+        $stmt = jogo2Conexao()->prepare(
+            "SELECT perfil FROM usuarios WHERE id = :id LIMIT 1"
+        );
+        $stmt->execute(["id" => $usuarioId]);
+        $perfilValidado = $stmt->fetchColumn();
+    }
+
+    if ($perfilValidado === false || $perfilValidado === "convidado") {
+        throw new Jogo2HttpException(
+            "Sua sessão expirou. Entre novamente.",
+            401
+        );
+    }
+
+    if ($perfilValidado !== "aluno") {
+        throw new Jogo2HttpException(
+            "Esta área é exclusiva para jogadores.",
+            403
+        );
+    }
+
+    return $usuarioId;
 }
 
 function jogo2Json(array $conteudo, int $status = 200): never

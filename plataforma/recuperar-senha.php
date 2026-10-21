@@ -116,7 +116,8 @@ if (($_SERVER["REQUEST_METHOD"] ?? "GET") === "POST") {
 
 plataforma_cabecalho("Recuperação de senha");
 ?>
-<h1>Recuperação de senha</h1>
+<section class="pagina-centralizada pagina-compacta" aria-labelledby="titulo-recuperacao">
+<h1 id="titulo-recuperacao">Recuperação de senha</h1>
 <?php if ($enviado): ?>
     <p role="status">Se o endereço estiver associado a uma conta e o serviço de e-mail estiver disponível, enviaremos um link válido por uma hora.</p>
 <?php else: ?>
@@ -129,4 +130,5 @@ plataforma_cabecalho("Recuperação de senha");
     </form>
 <?php endif; ?>
 <p><a href="login.php">Voltar ao login</a></p>
+</section>
 <?php plataforma_rodape(); ?>

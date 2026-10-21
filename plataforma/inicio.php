@@ -31,30 +31,52 @@ $conquistas = (int) $stmt->fetchColumn();
 
 plataforma_cabecalho("Início", $usuario);
 ?>
-<h1>Olá, <?= plataforma_escapar($usuario["nome"]) ?>!</h1>
-<p>Continue sua jornada de aprendizagem na Palavra a Bordo.</p>
-<section aria-labelledby="resumo-pessoal">
+<div class="painel-estudante">
+<header class="cabecalho-painel">
+    <p class="sobretitulo">Sua jornada continua</p>
+    <h1>Olá, <?= plataforma_escapar($usuario["nome"]) ?>!</h1>
+    <p>Continue sua jornada de aprendizagem na Palavra a Bordo.</p>
+</header>
+<section class="resumo-jogador" aria-labelledby="resumo-pessoal">
     <h2 id="resumo-pessoal">Seu progresso</h2>
-    <dl>
-        <dt>Nível</dt><dd><?= (int) $usuario["nivel"] ?></dd>
-        <dt>Experiência</dt><dd><?= number_format((int) $usuario["experiencia"], 0, ",", ".") ?> XP</dd>
-        <dt>Pontos no tesouro</dt><dd><?= number_format($saldo, 0, ",", ".") ?></dd>
-        <dt>Conquistas obtidas</dt><dd><?= $conquistas ?></dd>
+    <dl class="indicadores-jogador">
+        <div><dt>Nível</dt><dd><?= (int) $usuario["nivel"] ?></dd></div>
+        <div><dt>Experiência</dt><dd><?= number_format((int) $usuario["experiencia"], 0, ",", ".") ?> XP</dd></div>
+        <div><dt>Pontos no tesouro</dt><dd><?= number_format($saldo, 0, ",", ".") ?></dd></div>
+        <div><dt>Conquistas obtidas</dt><dd><?= $conquistas ?></dd></div>
     </dl>
 </section>
-<section aria-labelledby="jogos">
+<section class="secao-jogos" aria-labelledby="jogos">
     <h2 id="jogos">Jogar</h2>
-    <ul>
-        <li><a href="../jogo1/index.php?desafio=1">Jogo 1 — Caça ao Erro</a></li>
-        <li><a href="../jogo2/index.php">Jogo 2 — Expedição dos Sete Mares</a></li>
-    </ul>
+    <?php if (!$jogos): ?>
+        <p>Nenhum jogo ativo está cadastrado no momento.</p>
+    <?php else: ?>
+        <ul class="lista-jogos-estudante">
+            <?php foreach ($jogos as $jogo): ?>
+                <?php
+                $jogoId = (int) $jogo["jogo_id"];
+                $urlJogo = match ($jogoId) {
+                    1 => "../jogo1/index.php?desafio=1",
+                    2 => "../jogo2/index.php",
+                    default => null
+                };
+                ?>
+                <li class="cartao-jogo-estudante">
+                    <strong><?= plataforma_escapar($jogo["jogo"]) ?></strong>
+                    <?php if ($urlJogo !== null): ?>
+                        <a class="botao-jogo-estudante" href="<?= plataforma_escapar($urlJogo) ?>">Acessar jogo</a>
+                    <?php endif; ?>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    <?php endif; ?>
 </section>
-<section aria-labelledby="atividade-recente">
+<section class="progresso-jogos" aria-labelledby="atividade-recente">
     <h2 id="atividade-recente">Progresso por jogo</h2>
     <?php if (!$jogos): ?>
         <p>Nenhum jogo ativo está cadastrado.</p>
     <?php else: ?>
-        <ul>
+        <ul class="lista-progresso-jogos">
             <?php foreach ($jogos as $jogo): ?>
                 <li>
                     <strong><?= plataforma_escapar($jogo["jogo"]) ?></strong>:
@@ -67,4 +89,5 @@ plataforma_cabecalho("Início", $usuario);
         </ul>
     <?php endif; ?>
 </section>
+</div>
 <?php plataforma_rodape(); ?>

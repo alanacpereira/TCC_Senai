@@ -6,6 +6,7 @@ const botaoIniciar = document.getElementById("botao-iniciar");
 const botaoJogarNovamente = document.getElementById("botao-jogar-novamente");
 const botaoVoltarMenu = document.getElementById("botao-voltar-menu");
 const botaoVoltarInicio = document.getElementById("botao-voltar-inicio");
+const botaoSairInicial = document.getElementById("botao-sair-inicial");
 const botaoContinuar = document.getElementById("botao-continuar");
 const alternativas = document.getElementById("alternativas");
 const enunciado = document.getElementById("enunciado");
@@ -228,8 +229,10 @@ function mostrarResultadoResposta(resultado) {
 
     marcarAlternativas(resultado);
     tocarFeedback(resultado.correta);
+    botaoContinuar.disabled = false;
 
     if (resultado.finalizou) {
+        botaoContinuar.disabled = true;
         botaoContinuar.hidden = true;
         mostrarResultadoFinal(resultado);
     } else {
@@ -353,10 +356,23 @@ function voltarAoInicio() {
 
     podeResponder = false;
     botaoVoltarInicio.disabled = true;
+    botaoSairInicial.disabled = true;
     botaoIniciar.disabled = false;
     explicacao.hidden = true;
     botaoContinuar.hidden = true;
     mostrarTela(telaInicio);
+}
+
+function sairParaPlataforma() {
+    const destino = "../plataforma/index.php";
+    if (
+        tentativaId &&
+        !window.confirm("Se sair do jogo, a partida atual será abandonada. Deseja continuar?")
+    ) {
+        return;
+    }
+
+    window.location.href = destino;
 }
 
 botaoIniciar.addEventListener("click", iniciarDesafio);
@@ -364,5 +380,7 @@ botaoJogarNovamente.addEventListener("click", iniciarDesafio);
 botaoContinuar.addEventListener("click", continuarJogo);
 botaoVoltarMenu.addEventListener("click", voltarAoMenu);
 botaoVoltarInicio.addEventListener("click", voltarAoInicio);
+botaoSairInicial.addEventListener("click", sairParaPlataforma);
 
 mostrarTela(telaInicio);
+botaoSairInicial.disabled = false;

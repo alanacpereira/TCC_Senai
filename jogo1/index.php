@@ -1,5 +1,12 @@
 <?php
 
+require_once __DIR__ . "/../plataforma/config/app.php";
+require_once __DIR__ . "/../plataforma/includes/services.php";
+require_once __DIR__ . "/../plataforma/includes/layout.php";
+$pdo = plataforma_conexao();
+$usuario = plataforma_exigir_aluno($pdo, "../plataforma/login.php");
+$csrfAcessibilidade = plataforma_token_csrf();
+
 /*
  * Recebe o ID do desafio pela URL.
  *
@@ -35,21 +42,36 @@ if (!$desafioId) {
 
     <title>Caça ao Erro - Palavra a Bordo</title>
 
+    <?php plataforma_acessibilidade_bootstrap(true, $usuario["preferencias"] ?? []); ?>
+    <link
+        rel="stylesheet"
+        href="../plataforma/css/acessibilidade.css?v=12"
+    >
+
     <!--
         O CSS será criado depois.
         Por enquanto deixamos o link preparado.
     -->
     <link
         rel="stylesheet"
-        href="css/jogo.css?v=13"
+        href="css/jogo.css?v=14"
     >
+    <script
+        src="../plataforma/js/acessibilidade.js?v=3"
+        defer
+    ></script>
 
 </head>
 
 
-<body>
+<body class="jogo1-page">
+    <?php plataforma_widget_acessibilidade(
+        "../plataforma/api/preferencias-acessibilidade.php",
+        $csrfAcessibilidade
+    ); ?>
 
     <main id="jogo">
+        <?php plataforma_convite_acessibilidade(); ?>
 
         <!-- =========================================
              CABEÇALHO DO JOGO
@@ -304,10 +326,9 @@ if (!$desafioId) {
 
                 <button
                     type="button"
+                    id="botao-sair-inicial"
                     class="botao-voltar-inicio botao-sair-inicial"
-                    disabled
-                    title="O destino será configurado quando o menu principal estiver disponível."
-                    aria-label="Sair do jogo. O destino será configurado posteriormente."
+                    aria-label="Sair do jogo e voltar para a plataforma"
                 >
                     Sair do jogo
                 </button>
@@ -386,6 +407,10 @@ if (!$desafioId) {
         hidden
     ></div>
 
+    <?php plataforma_widget_acessibilidade(
+        "../plataforma/api/preferencias-acessibilidade.php",
+        $csrfAcessibilidade
+    ); ?>
 
     <!--
         O JavaScript será criado no próximo passo.

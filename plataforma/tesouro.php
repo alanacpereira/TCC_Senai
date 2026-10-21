@@ -213,6 +213,7 @@ $recompensas = $stmt->fetchAll();
 
 plataforma_cabecalho("Tesouro", $usuario);
 ?>
+<div class="pagina-centralizada pagina-tesouro">
 <h1>Tesouro</h1>
 <p>Saldo disponível: <strong><?= number_format($saldo, 0, ",", ".") ?> pontos</strong></p>
 <?php if ($erro !== ""): plataforma_mensagem_erro($erro); endif; ?>
@@ -268,4 +269,5 @@ plataforma_cabecalho("Tesouro", $usuario);
         </ul>
     <?php endif; ?>
 </section>
+</div>
 <?php plataforma_rodape(); ?>

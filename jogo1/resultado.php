@@ -4,8 +4,11 @@
  * Carrega o sistema de autenticação.
  */
 require_once __DIR__ . "/config/Auth.php";
-
-Auth::iniciarSessao();
+require_once __DIR__ . "/../plataforma/config/app.php";
+require_once __DIR__ . "/../plataforma/includes/services.php";
+$pdo = plataforma_conexao();
+$usuario = plataforma_exigir_aluno($pdo, "../plataforma/login.php");
+$usuarioId = (int) $usuario["id"];
 
 
 require_once __DIR__ . "/config/database.php";
@@ -32,20 +35,7 @@ if (!$tentativaId) {
 }
 
 
-/*
- * ------------------------------------------------------------
- * USUÁRIO TEMPORÁRIO
- * ------------------------------------------------------------
- */
-$usuarioId = Auth::usuarioId();
-
-if (!$usuarioId) {
-    $usuarioId = 1;
-}
-
-
 try {
-
     /*
      * Conecta ao banco.
      */

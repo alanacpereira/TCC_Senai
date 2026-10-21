@@ -4,23 +4,62 @@ declare(strict_types=1);
 
 require_once __DIR__ . "/../../jogo1/config/Auth.php";
 
-function plataforma_sessao(): void
+function plataforma_instalar_tratador_excecoes(): void
 {
-    if (session_status() === PHP_SESSION_ACTIVE) {
+    static $instalado = false;
+
+    if ($instalado || PHP_SAPI === "cli") {
         return;
     }
 
-    ini_set("session.use_strict_mode", "1");
-    ini_set("session.cookie_httponly", "1");
-    ini_set("session.cookie_samesite", "Lax");
-    session_set_cookie_params([
-        "lifetime" => 0,
-        "path" => "/",
-        "secure" => !empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off",
-        "httponly" => true,
-        "samesite" => "Lax"
-    ]);
-    Auth::iniciarSessao();
+    ini_set("display_errors", "0");
+    set_exception_handler(
+        static function (Throwable $erro): void {
+            error_log(
+                sprintf(
+                    "[Plataforma] %s em %s:%d",
+                    $erro->getMessage(),
+                    $erro->getFile(),
+                    $erro->getLine()
+                )
+            );
+            $status = http_response_code();
+            if ($status < 400) {
+                $status = 500;
+            }
+            http_response_code($status);
+            if (!headers_sent()) {
+                header("Content-Type: text/html; charset=UTF-8");
+            }
+            $mensagem = $erro instanceof RuntimeException
+                && $erro->getMessage() === "Sua sessão expirou. Atualize a página e tente novamente."
+                ? "Sua sessão expirou ou foi atualizada. Volte à página, atualize e tente novamente."
+                : "Ocorreu um erro ao processar esta solicitação. Tente novamente ou volte à página inicial.";
+            echo "<!doctype html><html lang=\"pt-BR\"><meta charset=\"utf-8\"><title>Não foi possível concluir</title><body><main><h1>Não foi possível concluir</h1><p>"
+                . plataforma_escapar($mensagem)
+                . "</p><p><a href=\"index.php\">Voltar à Palavra a Bordo</a></p></main></body></html>";
+        }
+    );
+    $instalado = true;
+}
+
+function plataforma_sessao(): void
+{
+    plataforma_instalar_tratador_excecoes();
+
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+        ini_set("session.use_strict_mode", "1");
+        ini_set("session.cookie_httponly", "1");
+        ini_set("session.cookie_samesite", "Lax");
+        session_set_cookie_params([
+            "lifetime" => 0,
+            "path" => "/",
+            "secure" => !empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off",
+            "httponly" => true,
+            "samesite" => "Lax"
+        ]);
+        Auth::iniciarSessao();
+    }
 
     if (!isset($_SESSION["plataforma_csrf"])) {
         $_SESSION["plataforma_csrf"] = bin2hex(random_bytes(32));
@@ -74,31 +113,6 @@ function plataforma_campo(array $dados, string $nome): string
 function plataforma_token_csrf(): string
 {
     plataforma_sessao();
-
-    if (PHP_SAPI !== "cli") {
-        ini_set("display_errors", "0");
-        set_exception_handler(
-            static function (Throwable $erro): void {
-                error_log(
-                    sprintf(
-                        "[Plataforma] %s em %s:%d",
-                        $erro->getMessage(),
-                        $erro->getFile(),
-                        $erro->getLine()
-                    )
-                );
-                $status = http_response_code();
-                if ($status < 400) {
-                    $status = 500;
-                }
-                http_response_code($status);
-                if (!headers_sent()) {
-                    header("Content-Type: text/html; charset=UTF-8");
-                }
-                echo "<!doctype html><html lang=\"pt-BR\"><meta charset=\"utf-8\"><title>Não foi possível concluir</title><body><main><h1>Não foi possível concluir</h1><p>Ocorreu um erro ao processar esta solicitação. Tente novamente ou volte à página inicial.</p><p><a href=\"index.php\">Voltar à Palavra a Bordo</a></p></main></body></html>";
-            }
-        );
-    }
     return (string) $_SESSION["plataforma_csrf"];
 }
 
@@ -138,13 +152,23 @@ function plataforma_migracao_aplicada(PDO $pdo): bool
                    'convites_professores',
                    'tokens_recuperacao_senha',
                    'limites_login'
-               )) AS tabelas_disponiveis"
+               )) AS tabelas_disponiveis,
+            (SELECT COUNT(*) FROM information_schema.COLUMNS
+             WHERE TABLE_SCHEMA = DATABASE()
+               AND TABLE_NAME = 'usuarios'
+               AND COLUMN_NAME = 'avatar_id') AS avatar_disponivel,
+            (SELECT COUNT(*) FROM information_schema.COLUMNS
+             WHERE TABLE_SCHEMA = DATABASE()
+               AND TABLE_NAME = 'preferencias_acessibilidade'
+               AND COLUMN_NAME = 'configurada') AS preferencias_configuradas_disponivel"
     );
     $stmt->execute();
     $estado = $stmt->fetch();
 
     return (int) $estado["perfil_disponivel"] === 1
-        && (int) $estado["tabelas_disponiveis"] === 11;
+        && (int) $estado["tabelas_disponiveis"] === 11
+        && (int) $estado["avatar_disponivel"] === 1
+        && (int) $estado["preferencias_configuradas_disponivel"] === 1;
 }
 
 function plataforma_usuario(PDO $pdo): ?array
@@ -157,7 +181,7 @@ function plataforma_usuario(PDO $pdo): ?array
     }
 
     $stmt = $pdo->prepare(
-        "SELECT id, nome, email, nivel, experiencia, data_cadastro, perfil
+        "SELECT id, nome, email, nivel, experiencia, data_cadastro, perfil, avatar_id
          FROM usuarios
          WHERE id = :id
          LIMIT 1"
@@ -167,7 +191,7 @@ function plataforma_usuario(PDO $pdo): ?array
 
     if ($usuario) {
         $stmt = $pdo->prepare(
-            "SELECT acessibilidade_visual, tamanho_fonte, alto_contraste,
+            "SELECT configurada, acessibilidade_visual, tamanho_fonte, alto_contraste,
                     espacamento_linhas, melhor_legibilidade, reduzir_animacoes,
                     destacar_interativos
              FROM preferencias_acessibilidade

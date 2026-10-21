@@ -3,9 +3,9 @@
 /*
  * Carrega o sistema de autenticação.
  */
-require_once __DIR__ . "/../config/Auth.php";
-
-Auth::iniciarSessao();
+require_once __DIR__ . "/../../plataforma/config/app.php";
+require_once __DIR__ . "/../../plataforma/includes/services.php";
+plataforma_sessao();
 
 header(
     "Content-Type: application/json; charset=UTF-8"
@@ -83,22 +83,11 @@ try {
 
 
     /*
-     * --------------------------------------------------------
-     * USUÁRIO TEMPORÁRIO
-     * --------------------------------------------------------
-     */
-    $usuarioId = Auth::usuarioId();
-
-    if (!$usuarioId) {
-        $usuarioId = 1;
-    }
-
-
-    /*
      * Conecta ao banco.
      */
     $database = new Database();
     $db = $database->conectar();
+    $usuarioId = plataforma_exigir_aluno_api($db);
 
 
     /*

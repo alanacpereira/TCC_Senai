@@ -71,7 +71,8 @@ $turmas = $stmt->fetchAll();
 
 plataforma_cabecalho("Minhas turmas", $professor);
 ?>
-<h1>Minhas turmas</h1>
+<section class="pagina-centralizada pagina-turmas" aria-labelledby="titulo-turmas">
+<h1 id="titulo-turmas">Minhas turmas</h1>
 <?php if ($erro !== ""): plataforma_mensagem_erro($erro); endif; ?>
 <?php if ($sucesso !== ""): ?><p role="status"><?= plataforma_escapar($sucesso) ?></p><?php endif; ?>
 <form method="post" action="turmas.php">
@@ -82,13 +83,16 @@ plataforma_cabecalho("Minhas turmas", $professor);
     <textarea id="descricao-turma" name="descricao" maxlength="500"></textarea>
     <button type="submit">Criar turma</button>
 </form>
-<ul>
+<ul class="lista-turmas">
     <?php foreach ($turmas as $turma): ?>
-        <li>
-            <a href="turma.php?id=<?= (int) $turma["id"] ?>"><?= plataforma_escapar($turma["nome"]) ?></a>
-            — código <?= plataforma_escapar($turma["codigo"]) ?>;
-            <?= (int) $turma["total_alunos"] ?> estudante(s)
+        <li class="cartao-turma">
+            <a href="turma.php?id=<?= (int) $turma["id"] ?>">
+                <strong><?= plataforma_escapar($turma["nome"]) ?></strong>
+            </a>
+            <span>Código <?= plataforma_escapar($turma["codigo"]) ?></span>
+            <span><?= (int) $turma["total_alunos"] ?> estudante(s)</span>
         </li>
     <?php endforeach; ?>
 </ul>
+</section>
 <?php plataforma_rodape(); ?>

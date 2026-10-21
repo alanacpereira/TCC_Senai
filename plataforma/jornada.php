@@ -59,6 +59,7 @@ $turmas = $stmt->fetchAll();
 
 plataforma_cabecalho("Jornada", $usuario);
 ?>
+<div class="pagina-centralizada pagina-jornada">
 <h1>Jornada de aprendizagem</h1>
 <section aria-labelledby="turmas">
     <h2 id="turmas">Minhas turmas</h2>
@@ -101,4 +102,5 @@ plataforma_cabecalho("Jornada", $usuario);
         <p>Não há jogos ativos cadastrados.</p>
     <?php endif; ?>
 </section>
+</div>
 <?php plataforma_rodape(); ?>

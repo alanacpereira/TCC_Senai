@@ -1,8 +1,9 @@
 # Palavra a Bordo — plataforma
 
 Esta pasta contém a plataforma PHP e a migração aditiva para integrar
-os jogos existentes. Os arquivos de `jogo1/` e `jogo2/` não são recriados nem
-alterados pela plataforma.
+os jogos existentes. As perguntas e regras de jogo permanecem existentes;
+as páginas e APIs receberam verificações de sessão para restringir o acesso
+ao perfil de estudante.
 
 ## Diagnóstico realizado
 
@@ -43,7 +44,7 @@ Após a migração, as contagens dessas tabelas existentes foram conferidas e
 permaneceram iguais. A conta convidada de ID 1 está marcada como `convidado`;
 as 11 tabelas da plataforma e o índice único de respostas foram confirmados.
 
-## Migração aplicada
+## Migrações aplicadas
 
 Arquivo: `database/migrations/001_plataforma_palavra_a_bordo.sql`.
 
@@ -76,6 +77,14 @@ para usar a plataforma. Em outra instalação, antes de executar:
 
 Consulta adicional de verificação somente leitura: `database/verificar.sql`.
 
+## Dados dos desafios do Jogo 1
+
+Depois de importar `localhost.sql` em uma instalação nova, carregue também
+`jogo1/dados_desafio_1.sql` e `jogo1/dados_desafios_2_4.sql`. Esses arquivos
+completam os quatro desafios com dez perguntas cada e podem ser executados
+novamente sem duplicar perguntas ou alternativas. O segundo arquivo também
+corrige a alternativa ortográfica marcada incorretamente no desafio de S e SS.
+
 O catálogo digital foi inicializado por
 `database/migrations/002_recompensas_digitais.sql`, também com `INSERT IGNORE`
 para não substituir itens existentes. Ele define:
@@ -91,6 +100,14 @@ Os custos formam uma progressão de colecionáveis virtuais: começam no valor d
 um acerto correto de 100 pontos e aumentam conforme a raridade visual. Não são
 dinheiro, não compram bens físicos e não alteram as regras ou dão vantagem nos
 jogos. O tesouro registra a aquisição e o histórico do resgate.
+
+O arquivo `database/migrations/003_perfil_avatar_acessibilidade.sql` adiciona
+o identificador de avatar à conta e um indicador explícito de que as
+preferências de acessibilidade foram configuradas. É uma migração aditiva,
+idempotente e não altera os dados de progresso. Contas existentes mantêm um
+avatar padrão; as preferências existentes só passam a ser consideradas
+configuradas quando o usuário escolhe e salva uma opção. Ela foi aplicada no
+banco local; as contagens de contas (4) e preferências (3) permaneceram iguais.
 
 ## Configuração local
 
@@ -155,30 +172,45 @@ Para SSL implícito, use `PLATAFORMA_SMTP_SECURITY=ssl` com a porta indicada
 pelo provedor. Sem variáveis, a aplicação usa o Mailpit local e a URL
 `http://localhost/TCC/plataforma`; não use esses padrões em produção.
 
-## Provisionar professor
+## Criar conta de professor com convite
 
-O papel de professor só pode ser criado no servidor. Com a migração instalada,
-use o provisionador CLI, que cria uma conta nova e não altera uma conta
-existente. Defina a senha forte no ambiente da sessão e não a inclua na linha
-de comando:
+O cadastro docente está disponível em `cadastro.php?perfil=professor`, mas só
+cria contas com um convite institucional válido. O responsável pela instituição
+gera o convite localmente por CLI:
 
 ```powershell
-$env:PLATAFORMA_PROFESSOR_PASSWORD = "uma-senha-forte-de-uso-local"
-php .\plataforma\bin\provisionar-professor.php "Nome do Professor" professor@example.org
-Remove-Item Env:\PLATAFORMA_PROFESSOR_PASSWORD
+php .\plataforma\bin\convidar-professor.php professor@example.org
 ```
 
-O comando não pode ser executado por HTTP. Convites de professor têm estrutura
-preparada no banco, mas o fluxo de envio e resgate ainda não está habilitado.
+O comando imprime um link vinculado ao e-mail informado, válido por sete dias
+e aceito uma única vez. Envie-o ao professor por um canal institucional seguro.
+O token em texto aparece somente na saída do comando; no banco fica armazenado
+somente seu hash. Após preencher nome e senha no formulário, a conta é criada
+e a pessoa entra diretamente no painel docente. Também é possível entrar depois
+em `login.php?perfil=professor`.
+
+O convite e a conta são confirmados na mesma transação, e o cadastro público
+recusa convites expirados, já usados ou associados a outro e-mail. O emissor de
+convites é exclusivo para CLI/servidor e não pode ser chamado por HTTP.
+
+Para provisionamento administrativo direto, o script
+`bin/provisionar-professor.php` permanece disponível para compatibilidade.
 
 ## Funcionalidades preparadas
 
-- Cadastro exclusivo de estudantes, login com hash de senha, CSRF e limitação
-  de tentativas de login.
-- Sessão compartilhada com a classe `Auth` existente para abrir os jogos como
-  o mesmo usuário; jogos, perguntas e endpoints não são reescritos.
-- Painel de estudante com nível/XP existentes, tentativas e atalhos para os
-  dois jogos.
+- Página inicial pública com cenário náutico, apresentação dos acessos de
+  jogador/professor, cadastro e login. Ela não lista jogos nem apresenta dados
+  pessoais; os jogos e o progresso ficam na área autenticada do estudante.
+- Cadastro público de estudantes com seleção segura de avatar; cadastro
+  docente com convite institucional de uso único e validade limitada. Os dois
+  perfis são verificados no servidor. Login com hash de senha, CSRF e limitação
+  de tentativas.
+- Sessão compartilhada com a classe `Auth` existente. As páginas e APIs dos
+  dois jogos exigem uma sessão de estudante válida; o fallback temporário para
+  o usuário de ID 1 foi removido.
+- Área protegida de estudante com nível/XP existentes, tentativas, conquistas,
+  saldo e atalhos para os dois jogos. O perfil professor continua direcionado
+  ao painel docente e não pode iniciar jogos de estudante.
 - A carteira pontua tentativas concluídas usando a pontuação do servidor e
   chave idempotente por tentativa; não cria saldo até haver atividade
   concluída.
@@ -186,20 +218,31 @@ preparada no banco, mas o fluxo de envio e resgate ainda não está habilitado.
   tentativas armazenadas no servidor.
 - O tesouro oferece quatro itens virtuais cosméticos, com custos definidos e
   resgate transacional registrado na coleção/histórico.
-- Professores podem criar turmas; estudantes entram com código; relatórios são
-  sempre filtrados pelos vínculos entre professor, turma e estudante.
-- Perfil, alteração de senha e preferências visuais persistidas. Preferências
-  afetam as páginas da plataforma; CSS isolado dos jogos não é alterado.
+- Professores podem criar turmas; estudantes entram com código; o dashboard,
+  busca de estudantes e relatório individual são limitados às turmas ativas
+  associadas ao professor. Sinais de revisão usam aproveitamento abaixo de 60%
+  nas respostas registradas e são apresentados como apoio, não diagnóstico.
+- Perfil, alteração de senha, avatar selecionável e preferências de
+  acessibilidade persistidas.
+  A Central compartilhada funciona na plataforma e nos dois jogos sem alterar
+  regras, perguntas, pontuação ou progresso.
 - Recuperação por e-mail com tokens de curta duração, uso único, limite de
   solicitações e suporte SMTP configurável.
 
 Não foi inventada regra para evolução de nível; o painel apresenta nível e XP
 já existentes. A carteira de pontos virtuais é separada da experiência.
 
+O visual da página inicial e dos componentes da plataforma está em
+`css/plataforma.css`. O banner usa a imagem náutica existente
+`../img/fundoinicial.png` (caminho relativo à folha CSS). Textos, navegação,
+cards e botões continuam sendo elementos reais da página. A integração não
+exige alteração adicional no MySQL. O card de prêmios reutiliza a ilustração
+existente `../jogo1/css/img/ba%C3%BA.png` a partir da rota da plataforma.
+
 ## Verificações e limitações
 
-Foram verificadas as contagens antes e depois da migração, as duplicidades de
-respostas, o índice único e as 11 tabelas novas. Todos os 20 arquivos PHP
+Foram verificadas as contagens antes e depois das migrações, as duplicidades de
+respostas, o índice único e as 11 tabelas novas. Os 43 arquivos PHP
 passaram em `php -l`. Testes funcionais locais cobriram cadastro, login,
 preferências, navegação entre os jogos, criação de turma, entrada de estudante,
 relatório docente, envio/captura de e-mail local, redefinição e uso único de
@@ -213,9 +256,39 @@ Ainda dependem de configuração/decisão do responsável:
   e o domínio autorizado de um provedor SMTP institucional.
 - O catálogo inicial contém apenas recompensas digitais e cosméticas; pontos
   não representam dinheiro, itens físicos ou vantagens nos jogos.
-- Acesso docente: crie cada conta de professor por meio do provisionador CLI,
-  usando os dados e a senha definidos pela instituição.
+- E-mail do convite docente: o comando emite um link para a instituição
+  distribuir por canal seguro; o envio automático de convites por e-mail ainda
+  não está integrado.
 
 Os dados de jogos, perguntas, alternativas, tentativas, respostas e conquistas
 foram preservados. Não foram cadastrados itens, preços ou regras de recompensa
 físicos nem vantagens pagas.
+
+Na revisão de acesso, as páginas dos dois jogos redirecionam visitantes para o
+login; as APIs retornam 401 para chamadas anônimas e 403 para perfil não
+autorizado. A revisão atual adicionou duas colunas por uma migração aditiva;
+nenhuma conta ou preferência foi removida ou recriada.
+
+O fluxo de convite docente também foi validado localmente: convite vinculado ao
+e-mail, recusa de token inválido ou incompatível, criação e consumo atômico do
+convite, redirecionamento ao painel docente e login posterior. O cadastro
+estudantil continuou funcional. As contas e convites temporários usados nesses
+testes foram removidos; a base voltou a 4 usuários, 3 preferências e nenhum
+convite de teste.
+
+## Central de Acessibilidade
+
+O botão flutuante abre a Central nas páginas da plataforma, login, cadastro e
+nos Jogos 1 e 2. Na primeira visita, uma pergunta não modal oferece ativar os
+recursos ou seguir sem eles. Nenhum recurso opcional é ligado automaticamente.
+As escolhas locais são gravadas no `localStorage`; a Central permanece
+disponível para alterar a decisão depois. O painel é operável por teclado e
+fecha com Esc.
+
+Para contas autenticadas, o endpoint
+`api/preferencias-acessibilidade.php` sincroniza as quatro opções com a tabela
+existente `preferencias_acessibilidade`, usando a sessão e o token CSRF. A
+migração 003 marca preferências explicitamente escolhidas; contas sem essa
+escolha começam com os recursos desligados. Em jogos e plataforma, a escolha
+local continua ativa se a sincronização da conta não estiver disponível. A
+preferência de movimento do sistema operacional continua respeitada.

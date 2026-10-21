@@ -18,16 +18,26 @@ if (($_SERVER["REQUEST_METHOD"] ?? "GET") === "POST") {
     try {
         plataforma_validar_csrf();
         $nome = trim(plataforma_campo($_POST, "nome"));
+        $avatarId = plataforma_campo($_POST, "avatar_id");
         if ($nome === "" || strlen($nome) > 100) {
             throw new RuntimeException("Informe um nome com até 100 caracteres.");
+        }
+        if (!array_key_exists($avatarId, plataforma_avatares())) {
+            throw new RuntimeException("Selecione um avatar disponível.");
         }
         $tamanhoFonte = (string) ($_POST["tamanho_fonte"] ?? "padrao");
         if (!in_array($tamanhoFonte, ["padrao", "grande", "muito_grande"], true)) {
             throw new RuntimeException("Tamanho de fonte inválido.");
         }
         $pdo->beginTransaction();
-        $stmt = $pdo->prepare("UPDATE usuarios SET nome = :nome WHERE id = :id");
-        $stmt->execute(["nome" => $nome, "id" => (int) $usuario["id"]]);
+        $stmt = $pdo->prepare(
+            "UPDATE usuarios SET nome = :nome, avatar_id = :avatar_id WHERE id = :id"
+        );
+        $stmt->execute([
+            "nome" => $nome,
+            "avatar_id" => $avatarId,
+            "id" => (int) $usuario["id"]
+        ]);
 
         $senhaAtual = plataforma_campo($_POST, "senha_atual");
         $senhaNova = plataforma_campo($_POST, "senha_nova");
@@ -61,14 +71,15 @@ if (($_SERVER["REQUEST_METHOD"] ?? "GET") === "POST") {
         }
         $stmt = $pdo->prepare(
             "INSERT INTO preferencias_acessibilidade
-                (usuario_id, acessibilidade_visual, tamanho_fonte,
+                (usuario_id, configurada, acessibilidade_visual, tamanho_fonte,
                  alto_contraste, espacamento_linhas, melhor_legibilidade,
                  reduzir_animacoes, destacar_interativos)
              VALUES
-                (:usuario_id, :acessibilidade_visual, :tamanho_fonte,
+                (:usuario_id, 1, :acessibilidade_visual, :tamanho_fonte,
                  :alto_contraste, :espacamento_linhas, :melhor_legibilidade,
                  :reduzir_animacoes, :destacar_interativos)
              ON DUPLICATE KEY UPDATE
+                configurada = 1,
                 acessibilidade_visual = VALUES(acessibilidade_visual),
                 tamanho_fonte = VALUES(tamanho_fonte),
                 alto_contraste = VALUES(alto_contraste),
@@ -118,9 +129,19 @@ $preferencias = plataforma_preferencias($pdo, (int) $usuario["id"]);
 
 plataforma_cabecalho("Perfil", $usuario);
 ?>
-<h1>Meu perfil</h1>
+<section class="pagina-centralizada pagina-perfil" aria-labelledby="titulo-perfil">
+<h1 id="titulo-perfil">Meu perfil</h1>
 <?php if ($erro !== ""): plataforma_mensagem_erro($erro); endif; ?>
 <?php if ($sucesso !== ""): ?><p role="status"><?= plataforma_escapar($sucesso) ?></p><?php endif; ?>
+<div class="resumo-perfil">
+    <span class="avatar-perfil" role="img" aria-label="Avatar: <?= plataforma_escapar(plataforma_avatar((string) $usuario["avatar_id"])["nome"]) ?>">
+        <?= plataforma_escapar(plataforma_avatar((string) $usuario["avatar_id"])["icone"]) ?>
+    </span>
+    <div>
+        <h2><?= plataforma_escapar($usuario["nome"]) ?></h2>
+        <p><?= plataforma_escapar($usuario["perfil"] === "professor" ? "Professor" : "Estudante") ?></p>
+    </div>
+</div>
 <dl>
     <dt>E-mail</dt><dd><?= plataforma_escapar($usuario["email"]) ?></dd>
     <dt>Perfil</dt><dd><?= $usuario["perfil"] === "professor" ? "Professor" : "Estudante" ?></dd>
@@ -128,10 +149,26 @@ plataforma_cabecalho("Perfil", $usuario);
     <dt>Experiência</dt><dd><?= number_format((int) $usuario["experiencia"], 0, ",", ".") ?> XP</dd>
     <dt>Pontos no tesouro</dt><dd><?= number_format((int) $saldo, 0, ",", ".") ?></dd>
 </dl>
-<form method="post" action="perfil.php">
+<form class="formulario-perfil" method="post" action="perfil.php">
     <input type="hidden" name="csrf_token" value="<?= plataforma_escapar(plataforma_token_csrf()) ?>">
     <label for="nome">Nome</label>
     <input id="nome" name="nome" maxlength="100" value="<?= plataforma_escapar($usuario["nome"]) ?>" required>
+    <fieldset class="galeria-avatares">
+        <legend>Seu avatar</legend>
+        <div class="opcoes-avatar">
+            <?php foreach (plataforma_avatares() as $idAvatar => $avatar): ?>
+                <label class="opcao-avatar">
+                    <input
+                        type="radio"
+                        name="avatar_id"
+                        value="<?= plataforma_escapar($idAvatar) ?>"
+                        <?= $idAvatar === $usuario["avatar_id"] ? "checked" : "" ?>>
+                    <span aria-hidden="true"><?= plataforma_escapar($avatar["icone"]) ?></span>
+                    <strong><?= plataforma_escapar($avatar["nome"]) ?></strong>
+                </label>
+            <?php endforeach; ?>
+        </div>
+    </fieldset>
     <fieldset>
         <legend>Alterar senha (opcional)</legend>
         <label for="senha-atual">Senha atual</label>
@@ -166,4 +203,5 @@ plataforma_cabecalho("Perfil", $usuario);
     </fieldset>
     <button type="submit">Salvar alterações</button>
 </form>
+</section>
 <?php plataforma_rodape(); ?>

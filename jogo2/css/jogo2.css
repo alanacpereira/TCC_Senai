@@ -1349,12 +1349,3 @@
         padding-bottom: 16px;
     }
 }
-
-@media (prefers-reduced-motion: reduce) {
-    #jogo2 *,
-    #jogo2 *::before,
-    #jogo2 *::after {
-        scroll-behavior: auto !important;
-        transition-duration: 0.01ms !important;
-    }
-}

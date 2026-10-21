@@ -12,6 +12,7 @@ const botaoIniciarMissao = document.getElementById("botao-iniciar-missao");
 const botaoResponder = document.getElementById("botao-responder");
 const botaoContinuar = document.getElementById("botao-continuar");
 const botaoVoltar = document.getElementById("botao-voltar");
+const botaoSairInicial = document.getElementById("botao-sair-inicial");
 const textoBotaoVoltar = document.getElementById("texto-botao-voltar");
 const botaoMenu = document.getElementById("botao-menu");
 const botaoTentarNovamente = document.getElementById("botao-tentar-novamente");
@@ -559,6 +560,21 @@ async function voltarAoMapa() {
     await carregarMissoes(missaoAtual?.id ?? null);
 }
 
+function sairParaPlataforma() {
+    const destino = "../plataforma/index.php";
+    if (
+        tentativaId &&
+        !resultadoResposta?.finalizou &&
+        !window.confirm(
+            "Se sair do jogo, a tentativa atual será abandonada. Deseja continuar?"
+        )
+    ) {
+        return;
+    }
+
+    window.location.href = destino;
+}
+
 botaoIniciarMissao.addEventListener("click", () => {
     iniciarMissao(missaoAtual?.tentativa_aberta?.id ?? null);
 });
@@ -566,7 +582,11 @@ botaoResponder.addEventListener("click", responder);
 botaoContinuar.addEventListener("click", continuar);
 botaoVoltar.addEventListener("click", voltarAoMapa);
 botaoMenu.addEventListener("click", voltarAoMapa);
+botaoSairInicial.addEventListener("click", sairParaPlataforma);
 botaoTentarNovamente.addEventListener("click", () => iniciarMissao());
 
 mostrarPainel(telaMissoes);
 carregarMissoes();
+if (botaoSairInicial) {
+    botaoSairInicial.disabled = false;
+}

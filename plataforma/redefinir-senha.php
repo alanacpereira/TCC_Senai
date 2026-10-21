@@ -94,7 +94,8 @@ if (($_SERVER["REQUEST_METHOD"] ?? "GET") === "POST") {
 
 plataforma_cabecalho("Redefinir senha");
 ?>
-<h1>Redefinir senha</h1>
+<section class="pagina-centralizada pagina-compacta" aria-labelledby="titulo-redefinir-senha">
+<h1 id="titulo-redefinir-senha">Redefinir senha</h1>
 <?php if ($erro !== ""): plataforma_mensagem_erro($erro); endif; ?>
 <?php if ($concluido): ?>
     <p role="status">Senha atualizada. Você já pode entrar com sua nova senha.</p>
@@ -113,4 +114,5 @@ plataforma_cabecalho("Redefinir senha");
         <button type="submit">Salvar nova senha</button>
     </form>
 <?php endif; ?>
+</section>
 <?php plataforma_rodape(); ?>
