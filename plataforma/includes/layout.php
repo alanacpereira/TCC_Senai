@@ -26,32 +26,28 @@ function plataforma_avatar(string $identificador): array
 
 function plataforma_prefixo(): string
 {
-    $caminhoRequisicao = parse_url(
+    $caminho = parse_url(
         $_SERVER["REQUEST_URI"] ?? "/",
         PHP_URL_PATH
     ) ?: "/";
 
-    $scriptAtual = str_replace(
+    $script = str_replace(
         "\\",
         "/",
         $_SERVER["SCRIPT_NAME"] ?? ""
     );
 
-    $diretorioAtual = dirname($scriptAtual);
-
-    if (str_contains($diretorioAtual, "/professor")) {
+    if (str_contains(dirname($script), "/professor")) {
         return "../";
     }
 
-    if (
-        $caminhoRequisicao === "/" ||
-        $caminhoRequisicao === "/index.php"
-    ) {
+    if ($caminho === "/" || $caminho === "/index.php") {
         return "plataforma/";
     }
 
     return "";
 }
+
 
 
 function plataforma_cabecalho(string $titulo, ?array $usuario = null): void
