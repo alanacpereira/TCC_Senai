@@ -22,49 +22,41 @@ function plataforma_avatar(string $identificador): array
     return $avatares[$identificador] ?? $avatares["marinheiro"];
 }
 
-
-
 function plataforma_prefixo(): string
 {
-    $caminho = parse_url(
+    $caminhoRequisicao = parse_url(
         $_SERVER["REQUEST_URI"] ?? "/",
         PHP_URL_PATH
     ) ?: "/";
 
-    $script = str_replace(
-        "\\",
+    $scriptAtual = str_replace(
+        "\\\\",
         "/",
         $_SERVER["SCRIPT_NAME"] ?? ""
     );
 
-    if (str_contains(dirname($script), "/professor")) {
+    $diretorioAtual = dirname($scriptAtual);
+
+    if (str_contains($diretorioAtual, "/professor")) {
         return "../";
     }
 
-    if ($caminho === "/" || $caminho === "/index.php") {
+    if (
+        $caminhoRequisicao === "/" ||
+        $caminhoRequisicao === "/index.php"
+    ) {
         return "plataforma/";
     }
 
     return "";
 }
 
-
-
 function plataforma_cabecalho(string $titulo, ?array $usuario = null): void
 {
     $preferencias = plataforma_preferencias_acessibilidade_normalizadas(
         $usuario["preferencias"] ?? []
     );
-    $scriptAtual = str_replace("\\", "/", $_SERVER["SCRIPT_NAME"] ?? "");
-    $diretorioAtual = dirname($scriptAtual);
-
-    if (str_contains($diretorioAtual, "/professor")) {
-        $prefixoPlataforma = "../";
-    } elseif (str_starts_with($scriptAtual, "/plataforma/")) {
-        $prefixoPlataforma = "";
-    } else {
-        $prefixoPlataforma = "plataforma/";
-    }
+    $prefixoPlataforma = plataforma_prefixo();
     $classes = plataforma_classes_acessibilidade($preferencias);
     $csrfAcessibilidade = plataforma_token_csrf();
 ?>
@@ -131,16 +123,15 @@ function plataforma_cabecalho(string $titulo, ?array $usuario = null): void
         <footer>
             <p>Palavra a Bordo — plataforma educacional.</p>
         </footer>
-        <script src="<?= plataforma_escapar(
-                            str_contains(str_replace("\\", "/", dirname($_SERVER["SCRIPT_NAME"] ?? "")), "/professor")
-                                ? "../js/plataforma.js?v=2"
-                                : "js/plataforma.js?v=6"
-                        ) ?>" defer></script>
-        <script src="<?= plataforma_escapar(
-                            str_contains(str_replace("\\", "/", dirname($_SERVER["SCRIPT_NAME"] ?? "")), "/professor")
-                                ? "../js/acessibilidade.js?v=3"
-                                : "js/acessibilidade.js?v=3"
-                        ) ?>" defer></script>
+        <?php
+            $prefixoPlataforma = plataforma_prefixo();
+            $estaNoProfessor = str_contains(
+                str_replace("\\\\", "/", dirname($_SERVER["SCRIPT_NAME"] ?? "")),
+                "/professor"
+            );
+        ?>
+        <script src="<?= plataforma_escapar($prefixoPlataforma . "js/plataforma.js?v=" . ($estaNoProfessor ? "2" : "6")) ?>" defer></script>
+        <script src="<?= plataforma_escapar($prefixoPlataforma . "js/acessibilidade.js?v=3") ?>" defer></script>
     </body>
 
     </html>
