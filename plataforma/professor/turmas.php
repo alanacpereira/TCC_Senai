@@ -9,7 +9,7 @@ $pdo = plataforma_conexao();
 if (!plataforma_migracao_aplicada($pdo)) {
     plataforma_redirecionar("../index.php?configuracao=pendente");
 }
-$professor = plataforma_exigir_login($pdo, "professor");
+$professor = plataforma_exigir_login($pdo, "professor", "../login.php");
 $erro = "";
 $sucesso = "";
 
@@ -73,9 +73,10 @@ plataforma_cabecalho("Minhas turmas", $professor);
 ?>
 <section class="pagina-centralizada pagina-turmas" aria-labelledby="titulo-turmas">
 <h1 id="titulo-turmas">Minhas turmas</h1>
+<p>Crie uma turma e compartilhe o código com seus estudantes. Quando eles entrarem usando esse código, os resultados dos jogos aparecerão no seu painel.</p>
 <?php if ($erro !== ""): plataforma_mensagem_erro($erro); endif; ?>
 <?php if ($sucesso !== ""): ?><p role="status"><?= plataforma_escapar($sucesso) ?></p><?php endif; ?>
-<form method="post" action="turmas.php">
+<form id="criar-turma" method="post" action="turmas.php">
     <input type="hidden" name="csrf_token" value="<?= plataforma_escapar(plataforma_token_csrf()) ?>">
     <label for="nome-turma">Nome da turma</label>
     <input id="nome-turma" name="nome" maxlength="120" required>

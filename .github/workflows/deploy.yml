@@ -1,0 +1,56 @@
+name: Deploy via FTP
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Publicar no servidor
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Baixar o código do repositório
+        uses: actions/checkout@v4
+
+      - name: Preparar PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: pdo_mysql
+
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Validar PHP
+        run: |
+          find plataforma jogo1 jogo2 -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+
+      - name: Validar JavaScript
+        run: |
+          find plataforma jogo1 jogo2 -type f -name '*.js' -print0 | xargs -0 -n1 node --check
+
+      - name: Publicar via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./
+          server-dir: /htdocs/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/.github/**
+            **/database/**
+            **/*.sql
+            **/*.md
+            **/*.docx
+            **/*.bak
+            **/.env*
+            __auth_test_router.php

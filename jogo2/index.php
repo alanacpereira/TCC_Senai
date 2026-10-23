@@ -28,7 +28,7 @@ if (
     <link rel="stylesheet" href="../plataforma/css/acessibilidade.css?v=12">
     <link rel="stylesheet" href="css/jogo2.css?v=3">
     <script src="../plataforma/js/acessibilidade.js?v=3" defer></script>
-    <script src="js/jogo2.js?v=2" defer></script>
+    <script src="js/jogo2.js?v=4" defer></script>
 </head>
 <body class="jogo2-page">
     <?php plataforma_widget_acessibilidade(

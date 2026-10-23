@@ -1,0 +1,11 @@
+Options -Indexes
+
+# Keep database exports, local documents, backups, and environment files private.
+<FilesMatch "(?i)(\.sql|\.sqlite|\.db|\.bak|\.backup|\.env|\.docx|\.md)$">
+    Require all denied
+</FilesMatch>
+
+# Do not expose repository metadata or dotfiles through Apache.
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>

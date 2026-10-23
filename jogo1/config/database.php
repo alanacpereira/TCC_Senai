@@ -2,16 +2,25 @@
 
 class Database
 {
-    // Dados de acesso ao banco
-    private $host = "localhost";
-    private $port = 3308;
-    private $db_name = "palavra_a_bordo";
-    private $username = "root";
-    private $password = "";
-    
+    private $host;
+    private $port;
+    private $db_name;
+    private $username;
+    private $password;
 
     // Guarda a conexão com o banco
     public $conn;
+
+    public function __construct()
+    {
+        // Usa variaveis do servidor e mantem os padroes locais do Laragon.
+        $this->host = getenv("DB_HOST") ?: "localhost";
+        $this->port = getenv("DB_PORT") ?: "3308";
+        $this->db_name = getenv("DB_NAME") ?: "palavra_a_bordo";
+        $this->username = getenv("DB_USER") ?: "root";
+        $password = getenv("DB_PASSWORD");
+        $this->password = $password === false ? "" : $password;
+    }
 
     // Cria a conexão
     public function conectar()
@@ -46,9 +55,12 @@ class Database
 
         } catch (PDOException $e) {
 
-            // Interrompe o sistema caso não consiga
-            // conectar ao banco
-            die("Erro ao conectar ao banco de dados: " . $e->getMessage());
+            error_log("[Jogo 1] Falha ao conectar ao banco: " . $e->getMessage());
+            throw new RuntimeException(
+                "Não foi possível conectar ao banco de dados.",
+                0,
+                $e
+            );
         }
 
         return $this->conn;

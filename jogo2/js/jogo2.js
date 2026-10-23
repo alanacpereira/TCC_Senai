@@ -561,7 +561,7 @@ async function voltarAoMapa() {
 }
 
 function sairParaPlataforma() {
-    const destino = "../plataforma/index.php";
+    const destino = "../plataforma/inicio.php#jogos";
     if (
         tentativaId &&
         !resultadoResposta?.finalizou &&
@@ -580,7 +580,14 @@ botaoIniciarMissao.addEventListener("click", () => {
 });
 botaoResponder.addEventListener("click", responder);
 botaoContinuar.addEventListener("click", continuar);
-botaoVoltar.addEventListener("click", voltarAoMapa);
+botaoVoltar.addEventListener("click", () => {
+    if (telaMissoes.hidden) {
+        sairParaPlataforma();
+        return;
+    }
+
+    voltarAoMapa();
+});
 botaoMenu.addEventListener("click", voltarAoMapa);
 botaoSairInicial.addEventListener("click", sairParaPlataforma);
 botaoTentarNovamente.addEventListener("click", () => iniciarMissao());

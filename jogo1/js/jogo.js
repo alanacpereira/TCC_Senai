@@ -346,25 +346,8 @@ function voltarAoMenu() {
     mostrarTela(telaInicio);
 }
 
-function voltarAoInicio() {
-    if (
-        tentativaId &&
-        !window.confirm("Se sair do jogo, a partida atual será abandonada. Deseja continuar?")
-    ) {
-        return;
-    }
-
-    podeResponder = false;
-    botaoVoltarInicio.disabled = true;
-    botaoSairInicial.disabled = true;
-    botaoIniciar.disabled = false;
-    explicacao.hidden = true;
-    botaoContinuar.hidden = true;
-    mostrarTela(telaInicio);
-}
-
 function sairParaPlataforma() {
-    const destino = "../plataforma/index.php";
+    const destino = "../plataforma/inicio.php#jogos";
     if (
         tentativaId &&
         !window.confirm("Se sair do jogo, a partida atual será abandonada. Deseja continuar?")
@@ -379,7 +362,7 @@ botaoIniciar.addEventListener("click", iniciarDesafio);
 botaoJogarNovamente.addEventListener("click", iniciarDesafio);
 botaoContinuar.addEventListener("click", continuarJogo);
 botaoVoltarMenu.addEventListener("click", voltarAoMenu);
-botaoVoltarInicio.addEventListener("click", voltarAoInicio);
+botaoVoltarInicio.addEventListener("click", sairParaPlataforma);
 botaoSairInicial.addEventListener("click", sairParaPlataforma);
 
 mostrarTela(telaInicio);

@@ -61,11 +61,11 @@ plataforma_cabecalho("Início", $usuario);
             <span class="selo-card" aria-hidden="true">⚓</span>
             <h2>Área do professor</h2>
             <p>Acesse o painel para acompanhar suas turmas e consultar o progresso dos estudantes.</p>
-            <div class="acoes-professor<?= $usuario ? " acoes-professor-unica" : "" ?>" role="group" aria-label="Ações da área do professor">
+            <div class="acoes-professor<?= $usuario && $usuario["perfil"] === "professor" ? " acoes-professor-unica" : "" ?>" role="group" aria-label="Ações da área do professor">
                 <a class="botao-plataforma" href="<?= $usuario && $usuario["perfil"] === "professor" ? "professor/index.php" : "login.php?perfil=professor" ?>">
                     <?= $usuario && $usuario["perfil"] === "professor" ? "Acessar painel do professor" : "Entrar como professor" ?>
                 </a>
-                <?php if (!$usuario): ?>
+                <?php if (!$usuario || $usuario["perfil"] === "aluno"): ?>
                     <a class="link-cadastro-professor" href="cadastro.php?perfil=professor" aria-label="Criar conta para professores">
                         Criar conta
                     </a>

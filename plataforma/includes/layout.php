@@ -45,7 +45,7 @@ function plataforma_cabecalho(string $titulo, ?array $usuario = null): void
         $preferencias
     ); ?>
     <link rel="stylesheet" href="<?= plataforma_escapar($prefixoPlataforma) ?>css/acessibilidade.css?v=12">
-    <link rel="stylesheet" href="<?= plataforma_escapar($prefixoPlataforma) ?>css/plataforma.css?v=29">
+    <link rel="stylesheet" href="<?= plataforma_escapar($prefixoPlataforma) ?>css/plataforma.css?v=41">
 </head>
 <body class="plataforma-page">
     <header>
@@ -61,6 +61,7 @@ function plataforma_cabecalho(string $titulo, ?array $usuario = null): void
                 <?php else: ?>
                     <a href="<?= plataforma_escapar($prefixoPlataforma) ?>inicio.php">Início</a>
                     <a href="<?= plataforma_escapar($prefixoPlataforma) ?>inicio.php#jogos">Jogos</a>
+                    <a href="<?= plataforma_escapar($prefixoPlataforma) ?>jornada.php">Entrar em turma</a>
                     <a href="<?= plataforma_escapar($prefixoPlataforma) ?>conquistas.php">Conquistas</a>
                     <a href="<?= plataforma_escapar($prefixoPlataforma) ?>tesouro.php">Tesouro</a>
                 <?php endif; ?>
@@ -94,8 +95,8 @@ function plataforma_rodape(): void
     <footer><p>Palavra a Bordo — plataforma educacional.</p></footer>
     <script src="<?= plataforma_escapar(
         str_contains(str_replace("\\", "/", dirname($_SERVER["SCRIPT_NAME"] ?? "")), "/professor")
-            ? "../js/plataforma.js?v=1"
-            : "js/plataforma.js?v=1"
+            ? "../js/plataforma.js?v=2"
+            : "js/plataforma.js?v=6"
     ) ?>" defer></script>
     <script src="<?= plataforma_escapar(
         str_contains(str_replace("\\", "/", dirname($_SERVER["SCRIPT_NAME"] ?? "")), "/professor")

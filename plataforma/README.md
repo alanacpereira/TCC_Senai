@@ -101,6 +101,12 @@ um acerto correto de 100 pontos e aumentam conforme a raridade visual. Não são
 dinheiro, não compram bens físicos e não alteram as regras ou dão vantagem nos
 jogos. O tesouro registra a aquisição e o histórico do resgate.
 
+A migração aditiva `database/migrations/003_recompensas_navegacao.sql` inclui
+um peixinho companheiro, uma gema do mar e um chapéu de pirata, todos como
+colecionáveis digitais sem entrega física. Para atualizar uma instalação que já
+aplicou as migrações anteriores, execute esse arquivo uma vez no banco
+`palavra_a_bordo`; o `INSERT IGNORE` preserva recompensas e resgates existentes.
+
 O arquivo `database/migrations/003_perfil_avatar_acessibilidade.sql` adiciona
 o identificador de avatar à conta e um indicador explícito de que as
 preferências de acessibilidade foram configuradas. É uma migração aditiva,
@@ -121,13 +127,12 @@ Por padrão a conexão lê:
 - `DB_PASSWORD=` (vazia somente no ambiente local Laragon)
 
 Em ambientes compartilhados ou produção, defina as credenciais em variáveis
-de ambiente, não em arquivos versionados. A plataforma e o Jogo 2 aceitam essas
-variáveis; o conector legado do Jogo 1 permanece inalterado e usa sua própria
-configuração existente.
+de ambiente, não em arquivos versionados. A plataforma e os dois jogos usam
+`DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER` e `DB_PASSWORD`.
 
-Abra `http://localhost/TCC/plataforma/` e crie uma conta pelo cadastro de
-estudante. A migração já está ativa neste banco local. A inscrição pública não
-permite escolher perfil de professor.
+Abra `http://localhost/TCC/plataforma/` para criar uma conta de estudante ou
+professor. Também é possível abrir `cadastro.php?perfil=professor` diretamente.
+A migração já está ativa neste banco local.
 
 ## Recuperação de senha e e-mail
 
@@ -172,39 +177,36 @@ Para SSL implícito, use `PLATAFORMA_SMTP_SECURITY=ssl` com a porta indicada
 pelo provedor. Sem variáveis, a aplicação usa o Mailpit local e a URL
 `http://localhost/TCC/plataforma`; não use esses padrões em produção.
 
-## Criar conta de professor com convite
+## Criar conta de professor
 
-O cadastro docente está disponível em `cadastro.php?perfil=professor`, mas só
-cria contas com um convite institucional válido. O responsável pela instituição
-gera o convite localmente por CLI:
-
-```powershell
-php .\plataforma\bin\convidar-professor.php professor@example.org
-```
-
-O comando imprime um link vinculado ao e-mail informado, válido por sete dias
-e aceito uma única vez. Envie-o ao professor por um canal institucional seguro.
-O token em texto aparece somente na saída do comando; no banco fica armazenado
-somente seu hash. Após preencher nome e senha no formulário, a conta é criada
-e a pessoa entra diretamente no painel docente. Também é possível entrar depois
-em `login.php?perfil=professor`.
-
-O convite e a conta são confirmados na mesma transação, e o cadastro público
-recusa convites expirados, já usados ou associados a outro e-mail. O emissor de
-convites é exclusivo para CLI/servidor e não pode ser chamado por HTTP.
+O cadastro docente está disponível em `cadastro.php?perfil=professor` e pode ser
+feito diretamente, sem convite. Após concluir o cadastro, a pessoa entra no
+painel docente. Para acessar uma conta existente, use `login.php?perfil=professor`.
 
 Para provisionamento administrativo direto, o script
 `bin/provisionar-professor.php` permanece disponível para compatibilidade.
+
+## Publicação
+
+O workflow `.github/workflows/deploy.yml` valida a sintaxe de PHP e JavaScript
+antes de publicar por FTP. Configure `FTP_SERVER`, `FTP_USERNAME` e
+`FTP_PASSWORD` nos secrets do GitHub. Configure `DB_HOST`, `DB_PORT`,
+`DB_NAME`, `DB_USER` e `DB_PASSWORD` no ambiente PHP do servidor; a publicação
+por FTP não configura variáveis do processo. Não use a conta local `root` sem
+senha em produção.
+
+O pacote de publicação exclui arquivos SQL, documentação, backups, arquivos de
+ambiente e ferramentas locais de teste. O `.htaccess` também bloqueia esses
+arquivos quando servido por Apache e desativa listagem de diretórios.
 
 ## Funcionalidades preparadas
 
 - Página inicial pública com cenário náutico, apresentação dos acessos de
   jogador/professor, cadastro e login. Ela não lista jogos nem apresenta dados
   pessoais; os jogos e o progresso ficam na área autenticada do estudante.
-- Cadastro público de estudantes com seleção segura de avatar; cadastro
-  docente com convite institucional de uso único e validade limitada. Os dois
-  perfis são verificados no servidor. Login com hash de senha, CSRF e limitação
-  de tentativas.
+- Cadastro público de estudantes com seleção segura de avatar e cadastro
+  docente direto, sem convite. Os dois perfis são verificados no servidor.
+  Login com hash de senha, CSRF e limitação de tentativas.
 - Sessão compartilhada com a classe `Auth` existente. As páginas e APIs dos
   dois jogos exigem uma sessão de estudante válida; o fallback temporário para
   o usuário de ID 1 foi removido.
@@ -242,8 +244,9 @@ existente `../jogo1/css/img/ba%C3%BA.png` a partir da rota da plataforma.
 ## Verificações e limitações
 
 Foram verificadas as contagens antes e depois das migrações, as duplicidades de
-respostas, o índice único e as 11 tabelas novas. Os 43 arquivos PHP
-passaram em `php -l`. Testes funcionais locais cobriram cadastro, login,
+respostas, o índice único e as 11 tabelas novas. Na revisão final, os 42
+arquivos PHP passaram em `php -l` e os 4 arquivos JavaScript passaram em
+`node --check`. Testes funcionais locais cobriram cadastro, login,
 preferências, navegação entre os jogos, criação de turma, entrada de estudante,
 relatório docente, envio/captura de e-mail local, redefinição e uso único de
 token, login com a senha redefinida e resgate de item com débito único. Os dados
@@ -256,9 +259,6 @@ Ainda dependem de configuração/decisão do responsável:
   e o domínio autorizado de um provedor SMTP institucional.
 - O catálogo inicial contém apenas recompensas digitais e cosméticas; pontos
   não representam dinheiro, itens físicos ou vantagens nos jogos.
-- E-mail do convite docente: o comando emite um link para a instituição
-  distribuir por canal seguro; o envio automático de convites por e-mail ainda
-  não está integrado.
 
 Os dados de jogos, perguntas, alternativas, tentativas, respostas e conquistas
 foram preservados. Não foram cadastrados itens, preços ou regras de recompensa
@@ -269,12 +269,10 @@ login; as APIs retornam 401 para chamadas anônimas e 403 para perfil não
 autorizado. A revisão atual adicionou duas colunas por uma migração aditiva;
 nenhuma conta ou preferência foi removida ou recriada.
 
-O fluxo de convite docente também foi validado localmente: convite vinculado ao
-e-mail, recusa de token inválido ou incompatível, criação e consumo atômico do
-convite, redirecionamento ao painel docente e login posterior. O cadastro
-estudantil continuou funcional. As contas e convites temporários usados nesses
-testes foram removidos; a base voltou a 4 usuários, 3 preferências e nenhum
-convite de teste.
+O cadastro direto de professor foi validado com redirecionamento ao painel
+docente e login posterior. O cadastro estudantil continuou funcional. As contas
+temporárias usadas nos testes foram removidas; a base voltou a 4 usuários e 3
+preferências.
 
 ## Central de Acessibilidade
 

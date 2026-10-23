@@ -29,6 +29,7 @@ if (($_SERVER["REQUEST_METHOD"] ?? "GET") === "POST") {
         if (!$turmaId) {
             throw new RuntimeException("Não foi encontrada uma turma ativa com esse código.");
         }
+        // O vínculo libera ao professor da turma o acesso aos resultados deste aluno.
         $stmt = $pdo->prepare(
             "INSERT IGNORE INTO turma_alunos (turma_id, aluno_id)
              VALUES (:turma_id, :aluno_id)"
@@ -60,26 +61,34 @@ $turmas = $stmt->fetchAll();
 plataforma_cabecalho("Jornada", $usuario);
 ?>
 <div class="pagina-centralizada pagina-jornada">
-<h1>Jornada de aprendizagem</h1>
-<section aria-labelledby="turmas">
-    <h2 id="turmas">Minhas turmas</h2>
+<header class="cabecalho-jornada">
+    <p class="sobretitulo">SUA TRIPULAÇÃO</p>
+    <h1>Minhas turmas</h1>
+    <p>Use o código fornecido pelo professor para conectar seus resultados.</p>
+</header>
+<section class="entrada-turma" aria-labelledby="titulo-entrada-turma">
+    <h2 id="titulo-entrada-turma">Entrar em uma turma</h2>
     <?php if ($erro !== ""): plataforma_mensagem_erro($erro); endif; ?>
     <?php if ($sucesso !== ""): ?><p role="status"><?= plataforma_escapar($sucesso) ?></p><?php endif; ?>
+    <form method="post" action="jornada.php">
+        <input type="hidden" name="csrf_token" value="<?= plataforma_escapar(plataforma_token_csrf()) ?>">
+        <label for="codigo-turma">Código da turma</label>
+        <input id="codigo-turma" name="codigo_turma" maxlength="12" pattern="[A-Fa-f0-9]{12}" inputmode="text" autocomplete="off" spellcheck="false" aria-describedby="ajuda-codigo-turma" required>
+        <small id="ajuda-codigo-turma">São 12 letras ou números. Peça o código ao seu professor.</small>
+        <button type="submit">Conectar à turma</button>
+    </form>
+</section>
+<section aria-labelledby="turmas-conectadas">
+    <h2 id="turmas-conectadas">Turmas conectadas</h2>
     <?php if ($turmas): ?>
-        <ul>
+        <ul class="lista-turmas-aluno">
             <?php foreach ($turmas as $turma): ?>
                 <li><?= plataforma_escapar($turma["nome"]) ?> — turma ativa</li>
             <?php endforeach; ?>
         </ul>
     <?php else: ?>
-        <p>Você ainda não está vinculado a uma turma.</p>
+        <p class="estado-vazio-jornada">Você ainda não entrou em uma turma.</p>
     <?php endif; ?>
-    <form method="post" action="jornada.php">
-        <input type="hidden" name="csrf_token" value="<?= plataforma_escapar(plataforma_token_csrf()) ?>">
-        <label for="codigo-turma">Código fornecido pelo professor</label>
-        <input id="codigo-turma" name="codigo_turma" maxlength="12" pattern="[A-Fa-f0-9]{12}" required>
-        <button type="submit">Entrar na turma</button>
-    </form>
 </section>
 <section aria-labelledby="progresso-jogos">
     <h2 id="progresso-jogos">Progresso nos jogos</h2>

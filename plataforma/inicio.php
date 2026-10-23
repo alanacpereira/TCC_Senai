@@ -28,6 +28,19 @@ $stmt = $pdo->prepare(
 );
 $stmt->execute(["usuario_id" => (int) $usuario["id"]]);
 $conquistas = (int) $stmt->fetchColumn();
+// O resgate no banco libera os cuidados interativos do peixinho.
+$stmt = $pdo->prepare(
+        "SELECT r.custo_pontos,
+                        CASE WHEN rr.id IS NULL THEN 0 ELSE 1 END AS resgatado
+         FROM recompensas r
+         LEFT JOIN resgates_recompensas rr
+             ON rr.recompensa_id = r.id AND rr.usuario_id = :usuario_id
+         WHERE r.codigo = 'companheiro-peixinho' AND r.ativa = 1
+         LIMIT 1"
+);
+$stmt->execute(["usuario_id" => (int) $usuario["id"]]);
+$recompensaPeixinho = $stmt->fetch();
+$peixinhoResgatado = $recompensaPeixinho && (int) $recompensaPeixinho["resgatado"] === 1;
 
 plataforma_cabecalho("Início", $usuario);
 ?>
@@ -45,6 +58,48 @@ plataforma_cabecalho("Início", $usuario);
         <div><dt>Pontos no tesouro</dt><dd><?= number_format($saldo, 0, ",", ".") ?></dd></div>
         <div><dt>Conquistas obtidas</dt><dd><?= $conquistas ?></dd></div>
     </dl>
+</section>
+<section
+    class="aquario-bordo<?= $peixinhoResgatado ? " aquario-desbloqueado" : " aquario-bloqueado" ?>"
+    aria-labelledby="titulo-aquario"
+    data-aquario>
+    <div class="ilustracao-aquario" aria-hidden="true">
+        <span class="planta-aquario">🌿</span>
+        <span class="bolha-aquario bolha-aquario-uma"></span>
+        <span class="bolha-aquario bolha-aquario-duas"></span>
+        <span class="peixe-aquario">🐠</span>
+    </div>
+    <div class="conteudo-aquario">
+        <p class="sobretitulo">COMPANHEIRO DE BORDO</p>
+        <h2 id="titulo-aquario">Aquário de bordo</h2>
+        <?php if ($peixinhoResgatado): ?>
+            <p>O Peixinho de Bordo já está navegando com você.</p>
+            <div class="acoes-aquario">
+                <button class="botao-bolhas" type="button" data-acao-aquario="bolhas">
+                    <span aria-hidden="true">✦</span> Soltar bolhas
+                </button>
+                <button class="botao-alimentar" type="button" data-acao-aquario="alimentar">
+                    <span aria-hidden="true">🐟</span> Dar comidinha
+                </button>
+            </div>
+            <p class="mensagem-aquario" role="status" aria-live="polite" data-mensagem-aquario>
+                Seu companheiro está explorando o fundo do mar.
+            </p>
+            <div class="contadores-aquario" aria-label="Cuidados com o peixinho nesta visita">
+                <span>Bolhas <strong data-contador-bolhas>0</strong></span>
+                <span>Lanchinhos <strong data-contador-alimentar>0</strong></span>
+            </div>
+        <?php elseif ($recompensaPeixinho): ?>
+            <p>Tem um novo companheiro esperando por você no Tesouro.</p>
+            <a class="link-aquario" href="tesouro.php">
+                Encontrar o Peixinho de Bordo
+                <span><?= number_format((int) $recompensaPeixinho["custo_pontos"], 0, ",", ".") ?> pontos</span>
+            </a>
+        <?php else: ?>
+            <p>O próximo companheiro da sua expedição está sendo preparado.</p>
+            <a class="link-aquario" href="tesouro.php">Visitar o Tesouro</a>
+        <?php endif; ?>
+    </div>
 </section>
 <section class="secao-jogos" aria-labelledby="jogos">
     <h2 id="jogos">Jogar</h2>

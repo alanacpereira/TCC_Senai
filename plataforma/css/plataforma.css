@@ -223,7 +223,7 @@ body>footer p {
 }
 
 .acoes-hero .botao-plataforma:hover {
-    box-shadow: 0 12px 24px rgb(4 24 29 / 30%);
+    box-shadow: 0 12px 24px rgba(5, 116, 144, 0.3);
     filter: none;
     transform: translateY(-2px);
 }
@@ -244,9 +244,9 @@ body>footer p {
     align-items: center;
     justify-content: center;
     padding: 11px 18px;
-    border: 2px solid #145e63;
+    border: 2px solid #0b6d74;
     border-radius: 12px;
-    background: #145e63;
+    background: #106a70;
     color: #fff8e6;
     font: inherit;
     font-weight: 800;
@@ -263,12 +263,12 @@ body>footer p {
 .hero-inicial .botao-dourado {
     border-color: #f2ca70;
     background: #f2ca70;
-    color: #173b49;
+    color: #175c78;
 }
 
 .hero-inicial .botao-contorno {
     border-color: #f8eac9;
-    background: rgb(8 47 67 / 62%);
+    background: rgba(19, 80, 111, 0.62);
     color: #fff8e6;
     backdrop-filter: blur(6px);
 }
@@ -514,12 +514,14 @@ body>footer p {
     min-height: 48px;
     gap: 10px;
     padding: 11px 18px;
-    border-color: #145e63;
+    border-color: #83bde0;
     border-radius: 12px;
-    background: linear-gradient(135deg, #1b7778, #145e63);
-    box-shadow: 0 6px 14px rgb(20 94 99 / 20%);
-    color: #fff8e6;
+    background: linear-gradient(135deg, #e0f2ff, #bfdef4);
+    box-shadow: 0 5px 12px rgb(45 112 155 / 17%);
+    color: #164b68;
+    font-weight: 800;
     letter-spacing: 0.01em;
+    text-decoration: none;
     transition:
         transform 160ms ease,
         box-shadow 160ms ease,
@@ -527,25 +529,12 @@ body>footer p {
         border-color 160ms ease;
 }
 
-.cartao-jogo-estudante .botao-jogo-estudante::after {
-    width: 8px;
-    height: 8px;
-    border-top: 2px solid currentColor;
-    border-right: 2px solid currentColor;
-    content: "";
-    transform: rotate(45deg);
-    transition: transform 160ms ease;
-}
-
 .cartao-jogo-estudante .botao-jogo-estudante:hover {
-    background: linear-gradient(135deg, #238b88, #176b70);
-    box-shadow: 0 9px 18px rgb(20 94 99 / 27%);
+    background: linear-gradient(135deg, #cce8fb, #a9d3f0);
+    box-shadow: 0 8px 16px rgb(45 112 155 / 24%);
+    border-color: #65a8d0;
     filter: none;
     transform: translateY(-2px);
-}
-
-.cartao-jogo-estudante .botao-jogo-estudante:hover::after {
-    transform: translateX(3px) rotate(45deg);
 }
 
 .cartao-jogo-estudante .botao-jogo-estudante:focus-visible,
@@ -630,6 +619,250 @@ body>footer p {
 
 .lista-progresso-jogos {
     margin: 20px 0 0;
+}
+
+/* Aquario e controles do companheiro do aluno. */
+.aquario-bordo {
+    display: grid;
+    grid-template-columns: 190px minmax(0, 1fr);
+    align-items: center;
+    gap: 24px;
+    padding: 22px clamp(20px, 4vw, 34px);
+    overflow: hidden;
+    border: 1px solid #9fcbd4;
+    border-radius: 16px;
+    background:
+        radial-gradient(ellipse at 8% 100%, rgb(96 178 181 / 13%) 0 22%, transparent 23%),
+        linear-gradient(115deg, #e6f7f8, #f7fcfd 58%, #dceff0);
+    box-shadow: 0 8px 22px rgb(8 47 67 / 9%);
+}
+
+.ilustracao-aquario {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1.34;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    border: 3px solid #b6d9df;
+    border-radius: 46% / 36%;
+    background:
+        radial-gradient(circle at 76% 22%, rgb(255 255 255 / 72%) 0 2px, transparent 3px),
+        radial-gradient(circle at 25% 35%, rgb(255 255 255 / 58%) 0 3px, transparent 4px),
+        linear-gradient(180deg, #bde9ec 0%, #8bcfd9 58%, #268797 59%, #176a79 100%);
+    box-shadow: inset 0 -12px 22px rgb(5 61 76 / 15%), 0 5px 12px rgb(8 47 67 / 12%);
+}
+
+.peixe-aquario {
+    position: relative;
+    z-index: 1;
+    display: block;
+    font-size: 3.5rem;
+    line-height: 1;
+    filter: drop-shadow(0 4px 3px rgb(5 61 76 / 22%));
+    transform: translateX(0);
+    transition: filter 200ms ease, transform 200ms ease;
+}
+
+.aquario-bloqueado .peixe-aquario {
+    filter: grayscale(0.6) drop-shadow(0 4px 3px rgb(5 61 76 / 18%));
+    opacity: 0.82;
+}
+
+.planta-aquario {
+    position: absolute;
+    bottom: 5px;
+    left: 14px;
+    font-size: 2rem;
+    transform: rotate(-18deg);
+}
+
+.bolha-aquario {
+    position: absolute;
+    bottom: 26%;
+    width: 9px;
+    aspect-ratio: 1;
+    border: 1px solid rgb(255 255 255 / 78%);
+    border-radius: 50%;
+    background: rgb(230 251 255 / 48%);
+    opacity: 0.48;
+}
+
+.bolha-aquario-uma {
+    left: 26%;
+}
+
+.bolha-aquario-duas {
+    right: 25%;
+    width: 6px;
+    bottom: 34%;
+}
+
+.conteudo-aquario {
+    min-width: 0;
+}
+
+.conteudo-aquario .sobretitulo {
+    margin-bottom: 5px;
+    color: #237384;
+}
+
+.conteudo-aquario h2 {
+    margin: 0 0 7px;
+    color: #123f4f;
+    font-size: 1.35rem;
+}
+
+.conteudo-aquario>p:not(.sobretitulo) {
+    margin: 0 0 14px;
+    color: #45636c;
+    line-height: 1.55;
+}
+
+.acoes-aquario {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.botao-bolhas,
+.botao-alimentar,
+.link-aquario {
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 9px 14px;
+    border: 1px solid #176a79;
+    border-radius: 9px;
+    background: #176a79;
+    color: #fff;
+    font: inherit;
+    font-weight: 800;
+    text-decoration: none;
+    transition: transform 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
+}
+
+.botao-bolhas:not(:disabled):hover,
+.botao-alimentar:not(:disabled):hover,
+.link-aquario:hover {
+    background: #0f5868;
+    box-shadow: 0 5px 12px rgb(8 47 67 / 16%);
+    transform: translateY(-1px);
+}
+
+.botao-bolhas:disabled,
+.botao-alimentar:disabled {
+    cursor: wait;
+    opacity: 0.8;
+}
+
+.botao-bolhas:focus-visible,
+.botao-alimentar:focus-visible,
+.link-aquario:focus-visible {
+    outline: 3px solid #dfa92f;
+    outline-offset: 3px;
+}
+
+.link-aquario {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+.botao-alimentar {
+    border-color: #9eced0;
+    background: #e3f4f2;
+    color: #155967;
+}
+
+.botao-alimentar:not(:disabled):hover {
+    background: #d0ece9;
+}
+
+.link-aquario span {
+    padding-left: 7px;
+    border-left: 1px solid rgb(255 255 255 / 45%);
+    color: #ffdf8c;
+    font-size: 0.88rem;
+}
+
+.mensagem-aquario {
+    min-height: 1.5em;
+    margin: 10px 0 0;
+    color: #45636c;
+    font-size: 0.9rem;
+    line-height: 1.45;
+}
+
+.aquario-resposta-visivel .mensagem-aquario {
+    padding: 9px 11px;
+    border-left: 4px solid #d6ae4c;
+    border-radius: 8px;
+    background: #fff5d7;
+    color: #31515a;
+    font-weight: 700;
+}
+
+.contadores-aquario {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.contadores-aquario span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 9px;
+    border: 1px solid #c5dfe1;
+    border-radius: 999px;
+    background: #f2faf9;
+    color: #42616a;
+    font-size: 0.84rem;
+}
+
+.contadores-aquario strong {
+    color: #155967;
+}
+
+.aquario-animando .peixe-aquario {
+    animation: nadar-peixinho 900ms ease-in-out;
+}
+
+.aquario-animando .bolha-aquario {
+    animation: subir-bolha 850ms ease-out;
+}
+
+.aquario-alimentando .peixe-aquario {
+    animation: comer-peixinho 900ms ease-in-out;
+}
+
+@keyframes nadar-peixinho {
+    0%, 100% { transform: translateX(0) rotate(0); }
+    35% { transform: translateX(18px) rotate(-8deg); }
+    70% { transform: translateX(-10px) rotate(6deg); }
+}
+
+@keyframes subir-bolha {
+    0% { opacity: 0.45; transform: translateY(0) scale(0.8); }
+    75% { opacity: 0.9; }
+    100% { opacity: 0; transform: translateY(-48px) scale(1.2); }
+}
+
+@keyframes comer-peixinho {
+    0%, 100% { transform: translateY(0) scale(1); }
+    40% { transform: translateY(-9px) scale(1.1) rotate(-7deg); }
+    75% { transform: translateY(2px) scale(0.98); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .aquario-animando .peixe-aquario,
+    .aquario-animando .bolha-aquario,
+    .aquario-alimentando .peixe-aquario {
+        animation: none;
+    }
 }
 
 .card-papel,
@@ -847,12 +1080,12 @@ body>main th {
     flex: 0 0 auto;
 }
 
-body>main a:not(.botao-plataforma):not(.card-jogo a) {
+body>main a:not(.botao-plataforma):not(.card-jogo a):not(.link-aquario) {
     color: #145e63;
     text-underline-offset: 0.16em;
 }
 
-body>main a:not(.botao-plataforma):not(.card-jogo a):hover {
+body>main a:not(.botao-plataforma):not(.card-jogo a):not(.link-aquario):hover {
     color: #082f43;
 }
 
@@ -1127,6 +1360,344 @@ body>main a:not(.botao-plataforma):not(.card-jogo a):hover {
     --cartao-cor-destaque: #d4a047;
     --cartao-cor-destaque-rgb: 212 160 71;
     --cartao-cor-foco: #77500b;
+}
+
+.pagina-centralizada:is(.pagina-tesouro, .pagina-conquistas) {
+    width: min(100%, 1080px);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.cabecalho-colecao {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 18px;
+    padding: 22px 26px;
+    border: 1px solid #8fc5d0;
+    border-radius: 16px;
+    background:
+        linear-gradient(110deg, rgb(7 61 80 / 97%), rgb(14 105 119 / 94%) 68%, rgb(25 130 132 / 94%)),
+        #073d50;
+    box-shadow: 0 12px 28px rgb(8 47 67 / 15%);
+    color: #f5fbff;
+}
+
+.icone-cabecalho-colecao {
+    width: 58px;
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgb(255 255 255 / 55%);
+    border-radius: 17px;
+    background: linear-gradient(145deg, #fff3cf, #f3cf78);
+    box-shadow: inset 0 1px 0 #fff, 0 5px 12px rgb(2 29 41 / 24%);
+    font-size: 1.8rem;
+}
+
+.cabecalho-colecao .sobretitulo {
+    margin: 0 0 5px;
+    color: #f6d787;
+    font-size: 0.75rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+}
+
+.cabecalho-colecao h1 {
+    margin: 0;
+    color: #fff;
+    font-size: 1.8rem;
+    line-height: 1.2;
+}
+
+.cabecalho-colecao p:last-child {
+    margin: 6px 0 0;
+    color: #d6edf2;
+    line-height: 1.5;
+}
+
+.saldo-tesouro {
+    display: grid;
+    justify-items: end;
+    gap: 1px;
+    padding-left: 18px;
+    border-left: 1px solid rgb(255 255 255 / 30%);
+    color: #e3f3f6;
+}
+
+.saldo-tesouro strong {
+    color: #ffe08a;
+    font-size: 1.8rem;
+    line-height: 1.1;
+}
+
+.saldo-tesouro small {
+    color: #d6edf2;
+}
+
+.resumo-colecao {
+    display: grid;
+    gap: 9px;
+    padding: 18px 2px 4px;
+}
+
+.rotulo-progresso-colecao {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    color: #315765;
+}
+
+.rotulo-progresso-colecao strong {
+    color: #0c5965;
+}
+
+.trilho-colecao {
+    height: 11px;
+    overflow: hidden;
+    border: 1px solid #c0dce4;
+    border-radius: 999px;
+    background: #e1eff3;
+}
+
+.trilho-colecao span {
+    height: 100%;
+    display: block;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #238a91, #e4b84f);
+    transition: width 300ms ease;
+}
+
+.pagina-centralizada>ul.grade-conquistas,
+.pagina-centralizada>ul.grade-tesouro {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr));
+    gap: 16px;
+}
+
+.cartao-conquista,
+.cartao-recompensa {
+    min-width: 0;
+    border: 1px solid #c3dce5;
+    border-radius: 14px;
+    background: linear-gradient(145deg, #fff, #f0f8fb);
+    box-shadow: 0 7px 18px rgb(8 47 67 / 8%);
+    transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.cartao-conquista:hover,
+.cartao-recompensa:hover {
+    transform: translateY(-3px);
+    border-color: #7dbbc7;
+    box-shadow: 0 13px 24px rgb(8 47 67 / 13%);
+}
+
+.cartao-conquista {
+    display: grid;
+    grid-template-columns: 58px minmax(0, 1fr);
+    align-content: start;
+    gap: 14px;
+    padding: 18px;
+}
+
+.icone-conquista {
+    width: 56px;
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    border: 1px solid #bdd8e0;
+    border-radius: 16px;
+    background: linear-gradient(145deg, #e2f3f7, #c4e2e9);
+    color: #174c60;
+    font-size: 1.65rem;
+}
+
+.conquista-desbloqueada .icone-conquista {
+    border-color: #e4c66f;
+    background: linear-gradient(145deg, #fff2c7, #f2d579);
+}
+
+.conteudo-conquista {
+    min-width: 0;
+}
+
+.estado-conquista,
+.tipo-recompensa {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    color: #296477;
+    font-size: 0.76rem;
+    font-weight: 800;
+}
+
+.conquista-desbloqueada .estado-conquista {
+    color: #8a6415;
+}
+
+.cartao-conquista h2,
+.cartao-recompensa h2 {
+    margin: 3px 0 8px;
+    color: #103f52;
+    font-size: 1.12rem;
+    line-height: 1.35;
+}
+
+.cartao-conquista p,
+.cartao-recompensa p {
+    margin: 0;
+    color: #46616b;
+    line-height: 1.55;
+}
+
+.cartao-conquista .condicao-conquista {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid #d8e8ed;
+    font-size: 0.9rem;
+}
+
+.data-conquista {
+    margin-top: 10px !important;
+    color: #86641b !important;
+    font-size: 0.84rem;
+    font-weight: 700;
+}
+
+.cartao-recompensa {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+}
+
+.topo-recompensa {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 13px;
+}
+
+.icone-recompensa {
+    width: 64px;
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    border: 1px solid #c5dce3;
+    border-radius: 18px;
+    background: linear-gradient(145deg, #e5f4f7, #cde8ec);
+    font-size: 2rem;
+}
+
+.recompensa-resgatada .icone-recompensa {
+    border-color: #e8d28c;
+    background: linear-gradient(145deg, #fff3cf, #f3d886);
+}
+
+.tipo-recompensa {
+    color: #57727b;
+    text-align: right;
+}
+
+.cartao-recompensa>p {
+    flex: 1 0 auto;
+}
+
+.custo-recompensa {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin: 15px 0 13px;
+    color: #8a6415;
+}
+
+.custo-recompensa>span:first-child {
+    font-size: 1.1rem;
+}
+
+.custo-recompensa strong {
+    color: #163f51;
+    font-size: 1.2rem;
+}
+
+.cartao-recompensa form {
+    width: 100%;
+    margin-top: auto;
+}
+
+.botao-resgatar {
+    width: 100%;
+    min-height: 44px;
+    padding: 9px 14px;
+    border: 1px solid #17636c;
+    border-radius: 9px;
+    background: linear-gradient(135deg, #1d7880, #145763);
+    color: #fff;
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease;
+}
+
+.botao-resgatar:not(:disabled):hover {
+    box-shadow: 0 6px 14px rgb(8 47 67 / 18%);
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+}
+
+.botao-resgatar:disabled {
+    border-color: #b8cbd0;
+    background: #e0eaed;
+    color: #536d71;
+    cursor: not-allowed;
+}
+
+.botao-resgatar:focus-visible {
+    outline: 3px solid #dfa92f;
+    outline-offset: 3px;
+}
+
+.faltam-pontos,
+.estado-recompensa {
+    display: block;
+    margin-top: 9px;
+    color: #5c737b;
+    font-size: 0.88rem;
+    line-height: 1.45;
+}
+
+.estado-recompensa {
+    margin-top: auto;
+    padding-top: 11px;
+    color: #806018;
+    font-weight: 800;
+}
+
+.mensagem-tesouro {
+    margin: 0;
+    padding: 12px 15px;
+    border: 1px solid #9ac8b5;
+    border-radius: 10px;
+    background: #e8f6ed;
+    color: #1b6046;
+}
+
+.mensagem-tesouro-erro {
+    border-color: #e2b4a6;
+    background: #fff0e9;
+    color: #873e2e;
+}
+
+.estado-vazio-tesouro {
+    padding: 22px;
+    border: 1px dashed #9dbec8;
+    border-radius: 14px;
+    background: #f0f8fa;
+    color: #385b68;
+    text-align: center;
 }
 
 .pagina-turmas,
@@ -1409,16 +1980,6 @@ body>main a:not(.botao-plataforma):not(.card-jogo a):hover {
     max-width: 620px;
 }
 
-.formulario-cadastro-professor #ajuda-convite-professor {
-    color: #536d71;
-    line-height: 1.5;
-}
-
-.formulario-cadastro-professor #convite-professor {
-    font-family: ui-monospace, Consolas, monospace;
-    letter-spacing: 0.04em;
-}
-
 .grafico-progresso {
     width: 100%;
     height: 16px;
@@ -1427,10 +1988,389 @@ body>main a:not(.botao-plataforma):not(.card-jogo a):hover {
 
 .painel-professor,
 .relatorio-aluno {
-    width: min(100%, 980px);
+    width: min(100%, 1120px);
     display: grid;
     gap: 22px;
     margin-inline: auto;
+}
+
+.painel-professor {
+    --cartao-cor-destaque: #287c8c;
+    --cartao-cor-destaque-rgb: 40 124 140;
+    --cartao-cor-foco: #155260;
+}
+
+.painel-professor>.cabecalho-painel {
+    border-left-color: #d5a744;
+    background: linear-gradient(115deg, #e2f2f5, #f7fbff 68%, #eaf4f3);
+}
+
+.painel-professor>.titulo-painel {
+    margin: 0;
+    color: #123f4f;
+    font-size: 1.25rem;
+}
+
+.painel-professor>.indicadores-docente {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.painel-professor>.indicadores-docente article {
+    min-height: 142px;
+    border-top: 4px solid #368997;
+    background: linear-gradient(155deg, #f8fcfd, #e6f2f5);
+}
+
+.painel-professor>.indicadores-docente article:nth-child(2) {
+    border-top-color: #d7aa4f;
+    background: linear-gradient(155deg, #fffdf6, #f7f0dc);
+}
+
+.painel-professor>.indicadores-docente article:nth-child(3) {
+    border-top-color: #5f9a79;
+    background: linear-gradient(155deg, #f8fcf8, #e8f3e9);
+}
+
+.painel-professor>.indicadores-docente article:nth-child(4) {
+    border-top-color: #cf8264;
+    background: linear-gradient(155deg, #fffaf7, #f7eae4);
+}
+
+.painel-professor>.indicadores-docente article>strong {
+    font-size: 2rem;
+    line-height: 1.1;
+}
+
+.painel-professor>section:not(.indicadores-docente) {
+    min-width: 0;
+    padding: clamp(20px, 3vw, 28px);
+    border: 1px solid #c5dce4;
+    border-radius: 16px;
+    background: linear-gradient(145deg, #fbfdfe, #edf5f7);
+    box-shadow: 0 8px 22px rgb(8 47 67 / 8%);
+}
+
+.painel-professor .cabecalho-secao {
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.painel-professor .cabecalho-secao .sobretitulo {
+    margin: 0 0 4px;
+    color: #287c8c;
+}
+
+.painel-professor .cabecalho-secao h2 {
+    color: #123f4f;
+}
+
+.botao-nova-turma,
+.botao-criar-turma {
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 9px 15px;
+    border: 1px solid #155f6d;
+    border-radius: 9px;
+    background: #176a79;
+    color: #fff;
+    font-weight: 800;
+    text-decoration: none;
+    transition: background-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+
+.botao-nova-turma:hover,
+.botao-criar-turma:hover {
+    background: #105764;
+    box-shadow: 0 5px 12px rgb(8 47 67 / 15%);
+    transform: translateY(-1px);
+}
+
+.botao-nova-turma:focus-visible,
+.botao-criar-turma:focus-visible,
+.codigo-turma-dashboard button:focus-visible {
+    outline: 3px solid #d5a744;
+    outline-offset: 3px;
+}
+
+.estado-vazio-professor {
+    display: grid;
+    grid-template-columns: 54px minmax(0, 1fr);
+    align-items: start;
+    gap: 16px;
+    padding: 20px;
+    border: 1px dashed #aacbd3;
+    border-radius: 13px;
+    background: #f3f9fa;
+}
+
+.icone-estado-professor {
+    width: 50px;
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    border-radius: 15px;
+    background: #d9edf0;
+    font-size: 1.55rem;
+}
+
+.estado-vazio-professor h3 {
+    margin: 0 0 6px;
+    color: #123f4f;
+    font-size: 1.1rem;
+}
+
+.estado-vazio-professor p {
+    margin: 0 0 14px;
+    color: #4e6871;
+    line-height: 1.55;
+}
+
+.lista-turmas-dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.cartao-turma-dashboard {
+    min-width: 0;
+    display: grid;
+    gap: 15px;
+    padding: 18px;
+    border: 1px solid #c3dce3;
+    border-radius: 13px;
+    background: #f8fcfd;
+    box-shadow: 0 5px 14px rgb(8 47 67 / 6%);
+}
+
+.topo-turma-dashboard {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.topo-turma-dashboard h3 {
+    margin: 0;
+    color: #123f4f;
+    font-size: 1.05rem;
+}
+
+.topo-turma-dashboard h3 a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.topo-turma-dashboard h3 a:hover {
+    color: #176a79;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.topo-turma-dashboard p {
+    margin: 5px 0 0;
+    color: #5a727a;
+    font-size: 0.9rem;
+}
+
+.selo-turma-dashboard {
+    width: 36px;
+    aspect-ratio: 1;
+    display: grid;
+    flex: 0 0 auto;
+    place-items: center;
+    border-radius: 11px;
+    background: #deeff1;
+}
+
+.codigo-turma-dashboard {
+    display: grid;
+    gap: 8px;
+    padding: 12px;
+    border: 1px solid #d6e7e9;
+    border-radius: 10px;
+    background: #eef7f7;
+}
+
+.codigo-turma-dashboard>span {
+    color: #4c6870;
+    font-size: 0.84rem;
+    font-weight: 700;
+}
+
+.codigo-turma-dashboard>div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.codigo-turma-dashboard code {
+    color: #113f51;
+    font-size: 1.1rem;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    overflow-wrap: anywhere;
+}
+
+.codigo-turma-dashboard button {
+    min-height: 36px;
+    flex: 0 0 auto;
+    padding: 6px 10px;
+    border: 1px solid #8fbac2;
+    border-radius: 8px;
+    background: #fff;
+    color: #155967;
+    font: inherit;
+    font-size: 0.84rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.codigo-turma-dashboard button:hover {
+    background: #e0f0f1;
+}
+
+.codigo-turma-dashboard [data-status-codigo] {
+    min-height: 1.35em;
+    margin: 0;
+    color: #28684f;
+    font-size: 0.82rem;
+}
+
+.pagina-turmas>p,
+.pagina-jornada>p,
+.cabecalho-jornada>p:last-child {
+    max-width: 68ch;
+    margin-inline: auto;
+    color: #4e6871;
+    line-height: 1.6;
+}
+
+.pagina-turmas #criar-turma,
+.pagina-jornada .entrada-turma form {
+    width: min(100%, 680px);
+    display: grid;
+    gap: 10px;
+    margin: 4px auto 10px;
+    padding: 18px;
+    border: 1px solid #d0e3e8;
+    border-radius: 12px;
+    background: #f0f7f8;
+}
+
+.pagina-turmas #criar-turma input,
+.pagina-turmas #criar-turma textarea,
+.pagina-jornada .entrada-turma form input {
+    width: 100%;
+    min-width: 0;
+    padding: 11px 12px;
+    border: 1px solid #a9c8d1;
+    border-radius: 8px;
+    background: #fff;
+    color: #173b49;
+    font: inherit;
+}
+
+.pagina-turmas #criar-turma textarea {
+    min-height: 92px;
+    resize: vertical;
+}
+
+.pagina-turmas #criar-turma button,
+.pagina-jornada .entrada-turma form button {
+    min-height: 44px;
+    justify-self: start;
+    padding: 9px 16px;
+    border: 1px solid #155f6d;
+    border-radius: 9px;
+    background: #176a79;
+    color: #fff;
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.pagina-turmas #criar-turma button:hover,
+.pagina-jornada .entrada-turma form button:hover {
+    background: #105764;
+}
+
+.pagina-turmas #criar-turma :is(input, textarea):focus-visible,
+.pagina-jornada .entrada-turma form input:focus-visible {
+    border-color: #287c8c;
+    outline: 3px solid rgb(40 124 140 / 22%);
+    outline-offset: 1px;
+}
+
+.cabecalho-jornada {
+    display: grid;
+    gap: 6px;
+    padding: 20px 0 4px;
+    text-align: center;
+}
+
+.cabecalho-jornada .sobretitulo {
+    margin: 0;
+    color: #287c8c;
+}
+
+.cabecalho-jornada h1 {
+    margin: 0;
+    color: #123f4f;
+    font-size: 1.8rem;
+}
+
+.pagina-jornada .entrada-turma {
+    border-top: 4px solid #d5a744;
+}
+
+.pagina-jornada .entrada-turma h2,
+.pagina-jornada>section h2 {
+    color: #123f4f;
+}
+
+.pagina-jornada .entrada-turma form {
+    margin-top: 4px;
+}
+
+.pagina-jornada .entrada-turma form small {
+    color: #58727a;
+    line-height: 1.45;
+}
+
+.lista-turmas-aluno {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.lista-turmas-aluno li {
+    padding: 13px 15px;
+    border: 1px solid #c5dce4;
+    border-radius: 10px;
+    background: #f2f8f9;
+    color: #244f5c;
+    font-weight: 700;
+}
+
+.estado-vazio-jornada {
+    margin: 0;
+    padding: 14px 16px;
+    border: 1px dashed #b4cfd5;
+    border-radius: 10px;
+    background: #f4f9fa;
+    color: #536d71;
 }
 
 .painel-estudante {
@@ -1569,6 +2509,31 @@ body>main .form-busca input {
 .cartao-turma span {
     color: #536d71;
     font-size: 0.95rem;
+}
+
+@media (max-width: 600px) {
+    .painel-professor>.indicadores-docente {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .painel-professor>.indicadores-docente article {
+        min-height: 126px;
+        padding: 14px;
+    }
+
+    .estado-vazio-professor {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 16px;
+    }
+
+    .codigo-turma-dashboard>div {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .codigo-turma-dashboard button {
+        width: 100%;
+    }
 }
 
 .lista-desempenho article {
@@ -1896,55 +2861,6 @@ html.a11y-high-contrast body>header .marca-plataforma {
     line-height: 1.5;
 }
 
-/* Campo de convite do professor */
-.campo-convite,
-.campo-convite-professor,
-.campo-codigo-professor,
-.codigo-professor,
-#campo-codigo-professor,
-#campo-convite-professor {
-    width: 100%;
-    margin: 8px 0 4px;
-    padding: 16px;
-    border: 1px solid #c5ddec;
-    border-left: 4px solid #d4a047;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #f1f8fd, #e4f1f8);
-}
-
-.campo-convite label,
-.campo-convite-professor label,
-.campo-codigo-professor label,
-.codigo-professor label,
-#campo-codigo-professor label,
-#campo-convite-professor label {
-    display: block;
-    margin-bottom: 7px;
-    color: #123f4f;
-    font-weight: 800;
-}
-
-.campo-convite p,
-.campo-convite-professor p,
-.campo-codigo-professor p,
-.codigo-professor p,
-#campo-codigo-professor p,
-#campo-convite-professor p {
-    margin: 6px 0 10px;
-    color: #536d71;
-    font-size: 0.94rem;
-    line-height: 1.5;
-}
-
-.campo-convite input,
-.campo-convite-professor input,
-.campo-codigo-professor input,
-.codigo-professor input,
-#campo-codigo-professor input,
-#campo-convite-professor input {
-    width: 100%;
-}
-
 [hidden] {
     display: none !important;
 }
@@ -1978,6 +2894,65 @@ html.a11y-high-contrast body>header .marca-plataforma {
 /* Celulares */
 @media (max-width: 600px) {
 
+    .aquario-bordo {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 16px;
+        padding: 18px;
+    }
+
+    .ilustracao-aquario {
+        width: min(100%, 210px);
+        justify-self: center;
+    }
+
+    .cabecalho-colecao {
+        grid-template-columns: 48px minmax(0, 1fr);
+        gap: 13px;
+        padding: 18px;
+    }
+
+    .icone-cabecalho-colecao {
+        width: 46px;
+        border-radius: 14px;
+        font-size: 1.5rem;
+    }
+
+    .cabecalho-colecao h1 {
+        font-size: 1.5rem;
+    }
+
+    .saldo-tesouro {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 12px 0 0;
+        border-top: 1px solid rgb(255 255 255 / 30%);
+        border-left: 0;
+    }
+
+    .saldo-tesouro strong {
+        margin-left: auto;
+        font-size: 1.45rem;
+    }
+
+    .cartao-conquista {
+        grid-template-columns: 46px minmax(0, 1fr);
+        gap: 12px;
+        padding: 15px;
+    }
+
+    .icone-conquista {
+        width: 46px;
+        border-radius: 14px;
+        font-size: 1.4rem;
+    }
+
+    .cartao-recompensa {
+        padding: 17px;
+    }
+
     .opcoes-perfil,
     .perfil-opcoes,
     .seletor-perfil .opcoes,
@@ -1989,15 +2964,6 @@ html.a11y-high-contrast body>header .marca-plataforma {
     .cartao-perfil-opcao {
         min-height: 0;
         padding: 14px;
-    }
-
-    .campo-convite,
-    .campo-convite-professor,
-    .campo-codigo-professor,
-    .codigo-professor,
-    #campo-codigo-professor,
-    #campo-convite-professor {
-        padding: 13px;
     }
 
     .links-perfil,

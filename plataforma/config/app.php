@@ -205,12 +205,16 @@ function plataforma_usuario(PDO $pdo): ?array
     return $usuario ?: null;
 }
 
-function plataforma_exigir_login(PDO $pdo, ?string $perfil = null): array
+function plataforma_exigir_login(
+    PDO $pdo,
+    ?string $perfil = null,
+    string $urlLogin = "login.php"
+): array
 {
     $usuario = plataforma_usuario($pdo);
 
     if (!$usuario || $usuario["perfil"] === "convidado") {
-        header("Location: login.php");
+        header("Location: " . $urlLogin);
         exit;
     }
 

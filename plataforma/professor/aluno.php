@@ -9,7 +9,7 @@ $pdo = plataforma_conexao();
 if (!plataforma_migracao_aplicada($pdo)) {
     plataforma_redirecionar("../index.php?configuracao=pendente");
 }
-$professor = plataforma_exigir_login($pdo, "professor");
+$professor = plataforma_exigir_login($pdo, "professor", "../login.php");
 $alunoId = filter_input(INPUT_GET, "id", FILTER_VALIDATE_INT, [
     "options" => ["min_range" => 1]
 ]);

@@ -9,7 +9,20 @@ $pdo = plataforma_conexao();
 if (!plataforma_migracao_aplicada($pdo)) {
     plataforma_redirecionar("../index.php?configuracao=pendente");
 }
-$professor = plataforma_exigir_login($pdo, "professor");
+$professor = plataforma_exigir_login($pdo, "professor", "../login.php");
+
+// Carrega apenas as turmas ativas que pertencem ao professor autenticado.
+$stmt = $pdo->prepare(
+    "SELECT t.id, t.nome, t.codigo, COUNT(DISTINCT ta.aluno_id) AS total_alunos
+     FROM turmas t
+     INNER JOIN turma_professores tp ON tp.turma_id = t.id
+     LEFT JOIN turma_alunos ta ON ta.turma_id = t.id
+     WHERE tp.professor_id = :professor_id AND t.ativa = 1
+     GROUP BY t.id, t.nome, t.codigo
+     ORDER BY t.nome, t.id"
+);
+$stmt->execute(["professor_id" => (int) $professor["id"]]);
+$turmas = $stmt->fetchAll();
 
 $stmt = $pdo->prepare(
     "SELECT COUNT(DISTINCT ta.aluno_id)
@@ -98,6 +111,7 @@ if ($busca !== "") {
 
 $sqlVinculos = "
     SELECT DISTINCT ta.aluno_id
+    -- Results only include students explicitly linked to this teacher's active classes.
     FROM turma_alunos ta
     INNER JOIN turmas t ON t.id = ta.turma_id AND t.ativa = 1
     INNER JOIN turma_professores tp ON tp.turma_id = t.id
@@ -173,70 +187,128 @@ plataforma_cabecalho("Painel do professor", $professor);
         </article>
     </section>
 
+    <section class="secao-turmas-docente" aria-labelledby="titulo-turmas-docente">
+        <div class="cabecalho-secao">
+            <div>
+                <p class="sobretitulo">SUA TRIPULAÇÃO</p>
+                <h2 id="titulo-turmas-docente">Turmas e códigos de entrada</h2>
+            </div>
+            <a class="botao-nova-turma" href="turmas.php#criar-turma">Criar turma</a>
+        </div>
+        <?php if (!$turmas): ?>
+            <div class="estado-vazio-professor">
+                <span class="icone-estado-professor" aria-hidden="true">⚓</span>
+                <div>
+                    <h3>Crie sua primeira turma</h3>
+                    <p>Ao criar a turma, você recebe um código. Compartilhe-o com seus estudantes para conectar as atividades deles a este painel.</p>
+                    <a class="botao-criar-turma" href="turmas.php#criar-turma">Criar primeira turma</a>
+                </div>
+            </div>
+        <?php else: ?>
+            <ul class="lista-turmas-dashboard">
+                <?php foreach ($turmas as $turma): ?>
+                    <li class="cartao-turma-dashboard">
+                        <div class="topo-turma-dashboard">
+                            <div>
+                                <h3><a href="turma.php?id=<?= (int) $turma["id"] ?>"><?= plataforma_escapar($turma["nome"]) ?></a></h3>
+                                <p><?= (int) $turma["total_alunos"] ?> estudante(s) vinculado(s)</p>
+                            </div>
+                            <span class="selo-turma-dashboard" aria-hidden="true">⚓</span>
+                        </div>
+                        <div class="codigo-turma-dashboard">
+                            <span>Código para os estudantes</span>
+                            <div>
+                                <code><?= plataforma_escapar($turma["codigo"]) ?></code>
+                                <button type="button" data-copiar-codigo="<?= plataforma_escapar($turma["codigo"]) ?>">Copiar código</button>
+                            </div>
+                            <p role="status" data-status-codigo></p>
+                        </div>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+    </section>
+
     <section aria-labelledby="titulo-alunos">
         <div class="cabecalho-secao">
             <h2 id="titulo-alunos">Estudantes das suas turmas</h2>
             <a href="turmas.php">Administrar turmas</a>
         </div>
-        <form method="get" action="index.php" class="form-busca">
-            <label for="busca-aluno">Buscar por nome</label>
-            <input id="busca-aluno" name="busca" type="search" maxlength="80" value="<?= plataforma_escapar($busca) ?>">
-            <button type="submit">Buscar</button>
-            <?php if ($busca !== ""): ?><a href="index.php">Limpar busca</a><?php endif; ?>
-        </form>
-        <?php if (!$alunos): ?>
-            <p><?= $totalAlunos === 0 ? "Ainda não há estudantes vinculados às suas turmas." : "Nenhum estudante corresponde à busca." ?></p>
-        <?php else: ?>
-            <div class="tabela-responsiva">
-                <table>
-                    <thead>
-                        <tr>
-                            <th scope="col">Estudante</th>
-                            <th scope="col">Atividades</th>
-                            <th scope="col">Aproveitamento</th>
-                            <th scope="col">Última atividade</th>
-                            <th scope="col">Situação</th>
-                            <th scope="col">Relatório</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    <?php foreach ($alunos as $aluno): ?>
-                        <?php
-                        $respostas = (int) $aluno["respostas"];
-                        $aproveitamento = $respostas > 0
-                            ? (int) round((int) $aluno["acertos"] * 100 / $respostas)
-                            : null;
-                        ?>
-                        <tr>
-                            <th scope="row"><?= plataforma_escapar($aluno["nome"]) ?></th>
-                            <td><?= (int) $aluno["tentativas"] ?></td>
-                            <td><?= $aproveitamento === null ? "Sem resultados" : "{$aproveitamento}%" ?></td>
-                            <td><?= plataforma_escapar($aluno["ultima_atividade"] ?? "Sem atividade") ?></td>
-                            <td>
-                                <?php if ($aproveitamento === null): ?>
-                                    Sem dados suficientes
-                                <?php elseif ($aproveitamento < 60): ?>
-                                    Revisão sugerida
-                                <?php else: ?>
-                                    Em acompanhamento
-                                <?php endif; ?>
-                            </td>
-                            <td><a href="aluno.php?id=<?= (int) $aluno["id"] ?>">Ver detalhes</a></td>
-                        </tr>
-                    <?php endforeach; ?>
-                    </tbody>
-                </table>
+        <?php if ($totalAlunos === 0): ?>
+            <div class="estado-vazio-professor estado-vazio-alunos">
+                <span class="icone-estado-professor" aria-hidden="true">🧭</span>
+                <div>
+                    <?php if ($turmas): ?>
+                        <h3>Aguardando seus estudantes</h3>
+                        <p>Compartilhe um dos códigos acima. Depois que os estudantes entrarem em “Minhas turmas”, os resultados aparecem aqui.</p>
+                        <a class="botao-criar-turma" href="turmas.php">Ver minhas turmas</a>
+                    <?php else: ?>
+                        <h3>Seus estudantes aparecerão aqui</h3>
+                        <p>Crie uma turma e compartilhe o código de entrada para começar a acompanhar os resultados.</p>
+                    <?php endif; ?>
+                </div>
             </div>
-            <?php if ($totalPaginas > 1): ?>
-                <nav aria-label="Paginação de estudantes" class="paginacao">
-                    <?php if ($pagina > 1): ?>
-                        <a href="?<?= http_build_query(["busca" => $busca, "pagina" => $pagina - 1]) ?>">Anterior</a>
-                    <?php endif; ?>
-                    <span>Página <?= $pagina ?> de <?= $totalPaginas ?></span>
-                    <?php if ($pagina < $totalPaginas): ?>
-                        <a href="?<?= http_build_query(["busca" => $busca, "pagina" => $pagina + 1]) ?>">Próxima</a>
-                    <?php endif; ?>
-                </nav>
+        <?php else: ?>
+            <form method="get" action="index.php" class="form-busca">
+                <label for="busca-aluno">Buscar por nome</label>
+                <input id="busca-aluno" name="busca" type="search" maxlength="80" value="<?= plataforma_escapar($busca) ?>">
+                <button type="submit">Buscar</button>
+                <?php if ($busca !== ""): ?><a href="index.php">Limpar busca</a><?php endif; ?>
+            </form>
+            <?php if (!$alunos): ?>
+                <p>Nenhum estudante corresponde à busca.</p>
+            <?php else: ?>
+                <div class="tabela-responsiva">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">Estudante</th>
+                                <th scope="col">Atividades</th>
+                                <th scope="col">Aproveitamento</th>
+                                <th scope="col">Última atividade</th>
+                                <th scope="col">Situação</th>
+                                <th scope="col">Relatório</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <?php foreach ($alunos as $aluno): ?>
+                            <?php
+                            $respostas = (int) $aluno["respostas"];
+                            $aproveitamento = $respostas > 0
+                                ? (int) round((int) $aluno["acertos"] * 100 / $respostas)
+                                : null;
+                            ?>
+                            <tr>
+                                <th scope="row"><?= plataforma_escapar($aluno["nome"]) ?></th>
+                                <td><?= (int) $aluno["tentativas"] ?></td>
+                                <td><?= $aproveitamento === null ? "Sem resultados" : "{$aproveitamento}%" ?></td>
+                                <td><?= plataforma_escapar($aluno["ultima_atividade"] ?? "Sem atividade") ?></td>
+                                <td>
+                                    <?php if ($aproveitamento === null): ?>
+                                        Sem dados suficientes
+                                    <?php elseif ($aproveitamento < 60): ?>
+                                        Revisão sugerida
+                                    <?php else: ?>
+                                        Em acompanhamento
+                                    <?php endif; ?>
+                                </td>
+                                <td><a href="aluno.php?id=<?= (int) $aluno["id"] ?>">Ver detalhes</a></td>
+                            </tr>
+                        <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+                <?php if ($totalPaginas > 1): ?>
+                    <nav aria-label="Paginação de estudantes" class="paginacao">
+                        <?php if ($pagina > 1): ?>
+                            <a href="?<?= http_build_query(["busca" => $busca, "pagina" => $pagina - 1]) ?>">Anterior</a>
+                        <?php endif; ?>
+                        <span>Página <?= $pagina ?> de <?= $totalPaginas ?></span>
+                        <?php if ($pagina < $totalPaginas): ?>
+                            <a href="?<?= http_build_query(["busca" => $busca, "pagina" => $pagina + 1]) ?>">Próxima</a>
+                        <?php endif; ?>
+                    </nav>
+                <?php endif; ?>
             <?php endif; ?>
         <?php endif; ?>
     </section>

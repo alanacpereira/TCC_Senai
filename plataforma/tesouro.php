@@ -200,7 +200,7 @@ $stmt = $pdo->prepare("SELECT saldo_pontos FROM carteiras WHERE usuario_id = :id
 $stmt->execute(["id" => (int) $usuario["id"]]);
 $saldo = (int) $stmt->fetchColumn();
 $stmt = $pdo->prepare(
-    "SELECT r.id, r.nome, r.descricao, r.tipo, r.custo_pontos, r.condicoes,
+    "SELECT r.id, r.codigo, r.nome, r.descricao, r.tipo, r.custo_pontos, r.condicoes,
             rr.resgatada_em
      FROM recompensas r
      LEFT JOIN resgates_recompensas rr
@@ -210,32 +210,78 @@ $stmt = $pdo->prepare(
 );
 $stmt->execute(["usuario_id" => (int) $usuario["id"]]);
 $recompensas = $stmt->fetchAll();
+$iconesRecompensas = [
+    "titulo-grumete-das-palavras" => "⚓",
+    "insignia-olho-de-aguia" => "🦅",
+    "bau-mapa-do-tesouro" => "🗺️",
+    "titulo-capitao-das-palavras" => "🏴‍☠️",
+    "companheiro-peixinho" => "🐠",
+    "gema-do-mar" => "💎",
+    "chapeu-de-pirata" => "🏴‍☠️"
+];
 
 plataforma_cabecalho("Tesouro", $usuario);
 ?>
 <div class="pagina-centralizada pagina-tesouro">
-<h1>Tesouro</h1>
-<p>Saldo disponível: <strong><?= number_format($saldo, 0, ",", ".") ?> pontos</strong></p>
-<?php if ($erro !== ""): plataforma_mensagem_erro($erro); endif; ?>
-<?php if ($sucesso !== ""): ?><p role="status"><?= plataforma_escapar($sucesso) ?></p><?php endif; ?>
+<header class="cabecalho-colecao cabecalho-tesouro">
+    <span class="icone-cabecalho-colecao" aria-hidden="true">💎</span>
+    <div>
+        <p class="sobretitulo">BAÚ DE BORDO</p>
+        <h1>Tesouro</h1>
+        <p>Troque seus pontos por lembranças digitais da expedição.</p>
+    </div>
+    <div class="saldo-tesouro">
+        <span>Seu saldo</span>
+        <strong><?= number_format($saldo, 0, ",", ".") ?></strong>
+        <small>pontos</small>
+    </div>
+</header>
+<?php if ($erro !== ""): ?>
+    <div class="mensagem-tesouro mensagem-tesouro-erro"><?php plataforma_mensagem_erro($erro); ?></div>
+<?php endif; ?>
+<?php if ($sucesso !== ""): ?>
+    <p class="mensagem-tesouro mensagem-tesouro-sucesso" role="status">
+        <span aria-hidden="true">✨</span> <?= plataforma_escapar($sucesso) ?>
+    </p>
+<?php endif; ?>
 <?php if (!$recompensas): ?>
-    <p>Ainda não há recompensas cadastradas. Nenhum custo ou item foi inventado.</p>
+    <p class="estado-vazio-tesouro">O baú está sendo preparado. Volte em breve para conferir as novidades.</p>
 <?php else: ?>
-    <ul>
+    <ul class="grade-tesouro">
         <?php foreach ($recompensas as $recompensa): ?>
-            <li>
+            <?php
+            $resgatada = !empty($recompensa["resgatada_em"]);
+            $iconeRecompensa = $iconesRecompensas[$recompensa["codigo"]] ?? "✨";
+            $tipoRecompensa = match ($recompensa["tipo"]) {
+                "bau" => "Baú especial",
+                "insignia" => "Insígnia",
+                "titulo" => "Título de bordo",
+                "item" => "Colecionável digital",
+                "desafio" => "Desafio",
+                default => "Recompensa"
+            };
+            ?>
+            <li class="cartao-recompensa<?= $resgatada ? " recompensa-resgatada" : "" ?>">
+                <div class="topo-recompensa">
+                    <span class="icone-recompensa" aria-hidden="true"><?= $iconeRecompensa ?></span>
+                    <span class="tipo-recompensa"><?= $tipoRecompensa ?></span>
+                </div>
                 <h2><?= plataforma_escapar($recompensa["nome"]) ?></h2>
                 <p><?= plataforma_escapar($recompensa["descricao"]) ?></p>
-                <p>Tipo: <?= plataforma_escapar($recompensa["tipo"]) ?> · Custo: <?= (int) $recompensa["custo_pontos"] ?> pontos</p>
+                <div class="custo-recompensa">
+                    <span aria-hidden="true">✦</span>
+                    <strong><?= number_format((int) $recompensa["custo_pontos"], 0, ",", ".") ?></strong>
+                    <span>pontos</span>
+                </div>
                 <?php if ($recompensa["resgatada_em"]): ?>
-                    <p>Resgatada em <?= plataforma_escapar($recompensa["resgatada_em"]) ?>.</p>
+                    <p class="estado-recompensa">Já está no seu baú</p>
                 <?php else: ?>
                     <form method="post" action="tesouro.php">
                         <input type="hidden" name="csrf_token" value="<?= plataforma_escapar(plataforma_token_csrf()) ?>">
                         <input type="hidden" name="recompensa_id" value="<?= (int) $recompensa["id"] ?>">
-                        <button type="submit" <?= $saldo < (int) $recompensa["custo_pontos"] ? "disabled" : "" ?>>Resgatar</button>
+                        <button class="botao-resgatar" type="submit" <?= $saldo < (int) $recompensa["custo_pontos"] ? "disabled" : "" ?>>Resgatar recompensa</button>
                         <?php if ($saldo < (int) $recompensa["custo_pontos"]): ?>
-                            <span>Faltam <?= (int) $recompensa["custo_pontos"] - $saldo ?> pontos.</span>
+                            <span class="faltam-pontos">Faltam <?= number_format((int) $recompensa["custo_pontos"] - $saldo, 0, ",", ".") ?> pontos.</span>
                         <?php endif; ?>
                     </form>
                 <?php endif; ?>
