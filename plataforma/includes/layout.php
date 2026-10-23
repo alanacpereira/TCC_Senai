@@ -22,6 +22,38 @@ function plataforma_avatar(string $identificador): array
     return $avatares[$identificador] ?? $avatares["marinheiro"];
 }
 
+
+
+function plataforma_prefixo(): string
+{
+    $caminhoRequisicao = parse_url(
+        $_SERVER["REQUEST_URI"] ?? "/",
+        PHP_URL_PATH
+    ) ?: "/";
+
+    $scriptAtual = str_replace(
+        "\\",
+        "/",
+        $_SERVER["SCRIPT_NAME"] ?? ""
+    );
+
+    $diretorioAtual = dirname($scriptAtual);
+
+    if (str_contains($diretorioAtual, "/professor")) {
+        return "../";
+    }
+
+    if (
+        $caminhoRequisicao === "/" ||
+        $caminhoRequisicao === "/index.php"
+    ) {
+        return "plataforma/";
+    }
+
+    return "";
+}
+
+
 function plataforma_cabecalho(string $titulo, ?array $usuario = null): void
 {
     $preferencias = plataforma_preferencias_acessibilidade_normalizadas(
