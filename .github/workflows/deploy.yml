@@ -1,3 +1,4 @@
+
 name: Deploy via FTP
 
 on:
@@ -27,6 +28,36 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Configurar banco do Jogo 1
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASS: ${{ secrets.DB_PASS }}
+        run: |
+          sed -i "s|getenv(\"DB_HOST\") ?: \"localhost\"|\"$DB_HOST\"|g" jogo1/config/database.php
+          sed -i "s|getenv(\"DB_PORT\") ?: \"3308\"|\"$DB_PORT\"|g" jogo1/config/database.php
+          sed -i "s|getenv(\"DB_NAME\") ?: \"palavra_a_bordo\"|\"$DB_NAME\"|g" jogo1/config/database.php
+          sed -i "s|getenv(\"DB_USER\") ?: \"root\"|\"$DB_USER\"|g" jogo1/config/database.php
+          sed -i '/$password = getenv("DB_PASSWORD");/c\        $this->password = getenv("DB_PASSWORD") ?: "";' jogo1/config/database.php
+          sed -i "s|getenv(\"DB_PASSWORD\")|\"$DB_PASS\"|g" jogo1/config/database.php
+          sed -i '/$this->password = $password === false ? "" : $password;/d' jogo1/config/database.php
+
+      - name: Configurar banco do Jogo 2
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASS: ${{ secrets.DB_PASS }}
+        run: |
+          sed -i "s|getenv(\"DB_HOST\") ?: \"localhost\"|\"$DB_HOST\"|g" jogo2/config/database.php
+          sed -i "s|getenv(\"DB_PORT\") ?: \"3308\"|\"$DB_PORT\"|g" jogo2/config/database.php
+          sed -i "s|getenv(\"DB_NAME\") ?: \"palavra_a_bordo\"|\"$DB_NAME\"|g" jogo2/config/database.php
+          sed -i "s|getenv(\"DB_USER\") ?: \"root\"|\"$DB_USER\"|g" jogo2/config/database.php
+          sed -i "s|getenv(\"DB_PASSWORD\")|\"$DB_PASS\"|g" jogo2/config/database.php
+
       - name: Validar PHP
         run: |
           find plataforma jogo1 jogo2 -type f -name '*.php' -print0 | xargs -0 -n1 php -l
@@ -42,7 +73,7 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./
-          server-dir: /htdocs/
+          server-dir: /palavraabordo.totalh.net/htdocs/
           exclude: |
             **/.git*
             **/.git*/**
