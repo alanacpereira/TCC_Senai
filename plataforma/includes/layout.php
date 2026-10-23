@@ -22,6 +22,7 @@ function plataforma_avatar(string $identificador): array
     return $avatares[$identificador] ?? $avatares["marinheiro"];
 }
 
+
 function plataforma_prefixo(): string
 {
     $caminhoRequisicao = parse_url(
@@ -30,26 +31,27 @@ function plataforma_prefixo(): string
     ) ?: "/";
 
     $scriptAtual = str_replace(
-        "\\\\",
+        "\\",
         "/",
         $_SERVER["SCRIPT_NAME"] ?? ""
     );
 
     $diretorioAtual = dirname($scriptAtual);
 
+    // Mantém os caminhos relativos das páginas do professor.
     if (str_contains($diretorioAtual, "/professor")) {
         return "../";
     }
 
-    if (
-        $caminhoRequisicao === "/" ||
-        $caminhoRequisicao === "/index.php"
-    ) {
+    // URLs acessadas pela raiz usam os arquivos da plataforma.
+    if (!str_starts_with($caminhoRequisicao, "/plataforma/")) {
         return "plataforma/";
     }
 
+    // Páginas acessadas diretamente dentro de /plataforma/.
     return "";
 }
+
 
 function plataforma_cabecalho(string $titulo, ?array $usuario = null): void
 {
