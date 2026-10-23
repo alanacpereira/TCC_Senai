@@ -1,4 +1,10 @@
+
 Options -Indexes
+DirectoryIndex plataforma/index.php
+
+# Redireciona a raiz para a plataforma
+RewriteEngine On
+RewriteRule ^$ plataforma/index.php [L]
 
 # Keep database exports, local documents, backups, and environment files private.
 <FilesMatch "(?i)(\.sql|\.sqlite|\.db|\.bak|\.backup|\.env|\.docx|\.md)$">
