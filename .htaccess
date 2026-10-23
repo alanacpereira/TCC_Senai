@@ -2,16 +2,22 @@
 Options -Indexes
 DirectoryIndex plataforma/index.php
 
-# Redireciona a raiz para a plataforma
 RewriteEngine On
+
+# Encaminha a raiz para a página inicial da plataforma
 RewriteRule ^$ plataforma/index.php [L]
 
-# Keep database exports, local documents, backups, and environment files private.
+# somente quando não existem na raiz e existem na plataforma
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{DOCUMENT_ROOT}/plataforma/$1 -f
+RewriteRule ^([a-zA-Z0-9_-]+\.php)$ plataforma/$1 [L]
+
+# Protege bancos de dados, backups, documentos e arquivos de ambiente
 <FilesMatch "(?i)(\.sql|\.sqlite|\.db|\.bak|\.backup|\.env|\.docx|\.md)$">
     Require all denied
 </FilesMatch>
 
-# Do not expose repository metadata or dotfiles through Apache.
+# Bloqueia acesso a arquivos ocultos e metadados do repositório
 <FilesMatch "^\.">
     Require all denied
 </FilesMatch>
