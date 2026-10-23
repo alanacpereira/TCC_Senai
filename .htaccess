@@ -7,6 +7,7 @@ RewriteEngine On
 # Encaminha a raiz para a página inicial da plataforma
 RewriteRule ^$ plataforma/index.php [L]
 
+# Encaminha arquivos PHP para a pasta plataforma
 # somente quando não existem na raiz e existem na plataforma
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{DOCUMENT_ROOT}/plataforma/$1 -f
