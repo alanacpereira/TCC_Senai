@@ -28,6 +28,60 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Configurar banco da plataforma
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASS: ${{ secrets.DB_PASS }}
+        run: |
+          php <<'PHP'
+          <?php
+          $path = 'plataforma/config/app.php';
+          $source = file_get_contents($path);
+          if ($source === false) {
+              fwrite(STDERR, "Não foi possível ler a configuração da plataforma.\n");
+              exit(1);
+          }
+
+          $values = [
+              'DB_HOST' => getenv('DB_HOST'),
+              'DB_PORT' => getenv('DB_PORT'),
+              'DB_NAME' => getenv('DB_NAME'),
+              'DB_USER' => getenv('DB_USER'),
+              'DB_PASSWORD' => getenv('DB_PASS'),
+          ];
+
+          foreach ($values as $name => $value) {
+              if ($value === false || ($name !== 'DB_PASSWORD' && $value === '')) {
+                  fwrite(STDERR, "Secret ausente ou vazio: {$name}.\n");
+                  exit(1);
+              }
+          }
+
+          $replacements = [
+              'getenv("DB_HOST") ?: "localhost"' => var_export($values['DB_HOST'], true),
+              'getenv("DB_PORT") ?: "3308"' => var_export($values['DB_PORT'], true),
+              'getenv("DB_NAME") ?: "palavra_a_bordo"' => var_export($values['DB_NAME'], true),
+              'getenv("DB_USER") ?: "root"' => var_export($values['DB_USER'], true),
+              'getenv("DB_PASSWORD")' => var_export($values['DB_PASSWORD'], true),
+          ];
+
+          foreach ($replacements as $search => $replacement) {
+              if (substr_count($source, $search) !== 1) {
+                  fwrite(STDERR, "Formato inesperado na configuração da plataforma.\n");
+                  exit(1);
+              }
+              $source = str_replace($search, $replacement, $source);
+          }
+
+          if (file_put_contents($path, $source) === false) {
+              fwrite(STDERR, "Não foi possível preparar a configuração da plataforma.\n");
+              exit(1);
+          }
+          PHP
+
       - name: Configurar banco do Jogo 1
         env:
           DB_HOST: ${{ secrets.DB_HOST }}
