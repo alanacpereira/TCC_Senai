@@ -132,43 +132,43 @@ function plataforma_validar_csrf(): void
 
 function plataforma_migracao_aplicada(PDO $pdo): bool
 {
-    $stmt = $pdo->prepare(
-        "SELECT
-            (SELECT COUNT(*) FROM information_schema.COLUMNS
-             WHERE TABLE_SCHEMA = DATABASE()
-               AND TABLE_NAME = 'usuarios'
-               AND COLUMN_NAME = 'perfil') AS perfil_disponivel,
-            (SELECT COUNT(*) FROM information_schema.TABLES
-             WHERE TABLE_SCHEMA = DATABASE()
-               AND TABLE_NAME IN (
-                   'preferencias_acessibilidade',
-                   'carteiras',
-                   'transacoes_carteira',
-                   'recompensas',
-                   'resgates_recompensas',
-                   'turmas',
-                   'turma_professores',
-                   'turma_alunos',
-                   'convites_professores',
-                   'tokens_recuperacao_senha',
-                   'limites_login'
-               )) AS tabelas_disponiveis,
-            (SELECT COUNT(*) FROM information_schema.COLUMNS
-             WHERE TABLE_SCHEMA = DATABASE()
-               AND TABLE_NAME = 'usuarios'
-               AND COLUMN_NAME = 'avatar_id') AS avatar_disponivel,
-            (SELECT COUNT(*) FROM information_schema.COLUMNS
-             WHERE TABLE_SCHEMA = DATABASE()
-               AND TABLE_NAME = 'preferencias_acessibilidade'
-               AND COLUMN_NAME = 'configurada') AS preferencias_configuradas_disponivel"
-    );
-    $stmt->execute();
-    $estado = $stmt->fetch();
+    $tabelas = [
+        "preferencias_acessibilidade",
+        "carteiras",
+        "transacoes_carteira",
+        "recompensas",
+        "resgates_recompensas",
+        "turmas",
+        "turma_professores",
+        "turma_alunos",
+        "convites_professores",
+        "tokens_recuperacao_senha",
+        "limites_login"
+    ];
 
-    return (int) $estado["perfil_disponivel"] === 1
-        && (int) $estado["tabelas_disponiveis"] === 11
-        && (int) $estado["avatar_disponivel"] === 1
-        && (int) $estado["preferencias_configuradas_disponivel"] === 1;
+    $tabelasDisponiveis = $pdo->query("SHOW TABLES")
+        ->fetchAll(PDO::FETCH_COLUMN);
+    foreach ($tabelas as $tabela) {
+        if (!in_array($tabela, $tabelasDisponiveis, true)) {
+            return false;
+        }
+    }
+
+    foreach ([
+        "usuarios" => ["perfil", "avatar_id"],
+        "preferencias_acessibilidade" => ["configurada"]
+    ] as $tabela => $colunas) {
+        $colunasDisponiveis = $pdo->query(
+            "SHOW COLUMNS FROM `{$tabela}`"
+        )->fetchAll(PDO::FETCH_COLUMN);
+        foreach ($colunas as $coluna) {
+            if (!in_array($coluna, $colunasDisponiveis, true)) {
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 
 function plataforma_usuario(PDO $pdo): ?array

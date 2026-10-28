@@ -1,48 +1,22 @@
 -- Migração aditiva para a plataforma Palavra a Bordo.
--- Alvo verificado: MySQL 8.4.3, banco palavra_a_bordo.
+-- Selecione o banco da aplicacao no phpMyAdmin antes de executar este arquivo.
 -- Não recria nem remove tabelas e não altera dados existentes dos jogos,
 -- perguntas, alternativas, tentativas ou respostas. Em usuarios, adiciona
 -- perfil com padrão aluno e identifica a conta convidada legada verificada.
--- Pode ser reaplicada: tabelas e coluna são verificadas antes de sua criação.
--- Revise as mensagens de diagnóstico ao final antes de integrar a aplicação.
-
-USE `palavra_a_bordo`;
+-- Execute uma única vez, após conferir que a coluna usuarios.perfil ainda não existe.
+-- Não consulta information_schema, que pode não estar acessível em hospedagem compartilhada.
 
 -- Contas existentes e novos cadastros começam como estudantes.
-SET @coluna_perfil_existe := (
-    SELECT COUNT(*)
-    FROM information_schema.COLUMNS
-    WHERE TABLE_SCHEMA = DATABASE()
-      AND TABLE_NAME = 'usuarios'
-      AND COLUMN_NAME = 'perfil'
-);
-SET @ddl_perfil := IF(
-    @coluna_perfil_existe = 0,
-    'ALTER TABLE `usuarios` ADD COLUMN `perfil` ENUM(''aluno'', ''professor'', ''convidado'') NOT NULL DEFAULT ''aluno'' AFTER `senha`',
-    'SELECT ''Coluna usuarios.perfil já existe; nenhuma alteração realizada.'' AS migration_status'
-);
-PREPARE stmt_perfil FROM @ddl_perfil;
-EXECUTE stmt_perfil;
-DEALLOCATE PREPARE stmt_perfil;
+ALTER TABLE `usuarios`
+    ADD COLUMN `perfil` ENUM('aluno', 'professor', 'convidado')
+    NOT NULL DEFAULT 'aluno' AFTER `senha`;
 
 -- O usuário 1 é o jogador convidado legado usado pelos jogos sem login.
--- A atualização só ocorre se a coluna realmente permitir o valor convidado.
-SET @perfil_convidado_disponivel := (
-    SELECT COUNT(*)
-    FROM information_schema.COLUMNS
-    WHERE TABLE_SCHEMA = DATABASE()
-      AND TABLE_NAME = 'usuarios'
-      AND COLUMN_NAME = 'perfil'
-      AND COLUMN_TYPE LIKE '%convidado%'
-);
-SET @sql_perfil_convidado := IF(
-    @perfil_convidado_disponivel = 1,
-    'UPDATE `usuarios` SET `perfil` = ''convidado'' WHERE `id` = 1 AND `nome` = ''Jogador convidado'' AND `perfil` = ''aluno''',
-    'SELECT ''Conta convidada não classificada: confirme manualmente o perfil da conta legada.'' AS migration_status'
-);
-PREPARE stmt_perfil_convidado FROM @sql_perfil_convidado;
-EXECUTE stmt_perfil_convidado;
-DEALLOCATE PREPARE stmt_perfil_convidado;
+UPDATE `usuarios`
+SET `perfil` = 'convidado'
+WHERE `id` = 1
+  AND `nome` = 'Jogador convidado'
+  AND `perfil` = 'aluno';
 
 -- Preferências são separadas dos dados de autenticação e têm padrões neutros.
 CREATE TABLE IF NOT EXISTS `preferencias_acessibilidade` (
@@ -248,61 +222,16 @@ SET @respostas_duplicadas := (
         HAVING COUNT(*) > 1
     ) AS pares_duplicados
 );
-SET @indice_respostas_existe := (
-    SELECT COUNT(*)
-    FROM (
-        SELECT `INDEX_NAME`
-        FROM information_schema.STATISTICS
-        WHERE TABLE_SCHEMA = DATABASE()
-          AND TABLE_NAME = 'respostas'
-          AND NON_UNIQUE = 0
-        GROUP BY `INDEX_NAME`
-        HAVING GROUP_CONCAT(`COLUMN_NAME` ORDER BY `SEQ_IN_INDEX` SEPARATOR ',')
-            = 'tentativa_id,pergunta_id'
-    ) AS indices_validos
-);
 SET @ddl_indice_respostas := IF(
     @respostas_duplicadas > 0,
     'SELECT ''Índice único não criado: há respostas duplicadas por tentativa/pergunta. Investigue os registros sem removê-los.'' AS migration_status',
-    IF(
-        @indice_respostas_existe = 0,
-        'ALTER TABLE `respostas` ADD UNIQUE INDEX `uq_respostas_tentativa_pergunta` (`tentativa_id`, `pergunta_id`)',
-        'SELECT ''Índice único de respostas já existe; nenhuma alteração realizada.'' AS migration_status'
-    )
+    'ALTER TABLE `respostas` ADD UNIQUE INDEX `uq_respostas_tentativa_pergunta` (`tentativa_id`, `pergunta_id`)'
 );
 PREPARE stmt_indice_respostas FROM @ddl_indice_respostas;
 EXECUTE stmt_indice_respostas;
 DEALLOCATE PREPARE stmt_indice_respostas;
 
--- Verificação pós-migração. A ausência das novas tabelas antes de executar
--- esta migração não afeta os dados atuais dos jogos.
-SELECT `TABLE_NAME`
-FROM information_schema.TABLES
-WHERE TABLE_SCHEMA = DATABASE()
-  AND `TABLE_NAME` IN (
-      'preferencias_acessibilidade',
-      'carteiras',
-      'transacoes_carteira',
-      'recompensas',
-      'resgates_recompensas',
-      'turmas',
-      'turma_professores',
-      'turma_alunos',
-      'convites_professores',
-      'tokens_recuperacao_senha',
-      'limites_login'
-  )
-ORDER BY `TABLE_NAME`;
-
-SELECT `COLUMN_NAME`, `COLUMN_TYPE`, `COLUMN_DEFAULT`
-FROM information_schema.COLUMNS
-WHERE TABLE_SCHEMA = DATABASE()
-  AND TABLE_NAME = 'usuarios'
-  AND COLUMN_NAME = 'perfil';
-
-SELECT `INDEX_NAME`, `COLUMN_NAME`, `NON_UNIQUE`
-FROM information_schema.STATISTICS
-WHERE TABLE_SCHEMA = DATABASE()
-  AND TABLE_NAME = 'respostas'
-  AND `INDEX_NAME` = 'uq_respostas_tentativa_pergunta'
-ORDER BY `SEQ_IN_INDEX`;
+-- Verificação pós-migração com comandos limitados ao banco selecionado.
+SHOW TABLES;
+SHOW COLUMNS FROM `usuarios`;
+SHOW INDEX FROM `respostas`;

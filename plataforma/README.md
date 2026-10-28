@@ -50,32 +50,38 @@ Arquivo: `database/migrations/001_plataforma_palavra_a_bordo.sql`.
 
 O script:
 
-- Usa somente `palavra_a_bordo`.
+- Deve ser executado com o banco da aplicação selecionado no phpMyAdmin.
+- Não consulta `information_schema`, que pode estar bloqueado em hospedagem
+  compartilhada.
 - Não apaga, recria ou repovoa tabelas existentes.
-- Adiciona `usuarios.perfil` apenas quando a coluna não existe; novas contas
-  ficam como `aluno`, e a conta convidada legada é marcada como `convidado`
-  somente quando o tipo da coluna aceita esse perfil e ID/nome correspondem.
+- Adiciona `usuarios.perfil` com padrão `aluno`, e marca como `convidado`
+  somente a conta legada cujo ID e nome correspondem.
 - Cria, se ausentes, tabelas para preferências, carteira, extrato, recompensas,
   resgates, turmas/vínculos, convites, tokens de recuperação e limitação de
   login.
 - Tenta adicionar uma restrição única para respostas por tentativa/pergunta
   somente se os dados atuais não tiverem duplicatas. Se houver duplicatas,
   preserva-as e informa que o índice foi ignorado.
-- Exibe consultas de verificação ao final.
+- Exibe verificações usando `SHOW TABLES`, `SHOW COLUMNS` e `SHOW INDEX`.
 
-**A migração já foi executada neste banco local.** O script permanece no
-repositório para auditoria e é idempotente. Não é necessário executá-lo de novo
-para usar a plataforma. Em outra instalação, antes de executar:
+O script de migração é de execução única: as tabelas usam `IF NOT EXISTS`, mas
+as alterações de colunas e índice não devem ser repetidas. Antes de executar:
 
-1. Faça um backup do banco `palavra_a_bordo`.
-2. Revise o arquivo SQL, inclusive as verificações e o tratamento do perfil
-   convidado.
-3. Execute apenas esse arquivo no banco correto pelo phpMyAdmin ou cliente
-   MySQL; não execute `jogo1/dados_desafio_1.sql` nem qualquer carga de jogos.
-4. Confira os resultados de verificação e compare as contagens das tabelas
-   existentes antes e depois.
+1. Faça um backup do banco da aplicação.
+2. Selecione o banco correto no phpMyAdmin; não dependa de o nome ser
+   literalmente `palavra_a_bordo`, pois hospedagens podem acrescentar prefixos.
+3. Use `SHOW COLUMNS FROM usuarios LIKE 'perfil';` e `SHOW INDEX FROM respostas;`
+   para confirmar que as alterações ainda não foram aplicadas. Se `perfil` ou
+   o índice `uq_respostas_tentativa_pergunta` já existir, não execute o arquivo
+   inteiro: adapte apenas a alteração que falta.
+4. Execute o arquivo pelo phpMyAdmin; não execute
+   `jogo1/dados_desafio_1.sql` nem qualquer carga de jogos como parte desta
+   migração.
+5. Execute também, uma única vez, `database/migrations/003_perfil_avatar_acessibilidade.sql`
+   depois da migration 001, e confira o resultado com `database/verificar.sql`.
 
 Consulta adicional de verificação somente leitura: `database/verificar.sql`.
+Selecione o banco da aplicação antes de executá-la.
 
 ## Dados dos desafios do Jogo 1
 
@@ -110,10 +116,11 @@ aplicou as migrações anteriores, execute esse arquivo uma vez no banco
 O arquivo `database/migrations/003_perfil_avatar_acessibilidade.sql` adiciona
 o identificador de avatar à conta e um indicador explícito de que as
 preferências de acessibilidade foram configuradas. É uma migração aditiva,
-idempotente e não altera os dados de progresso. Contas existentes mantêm um
-avatar padrão; as preferências existentes só passam a ser consideradas
-configuradas quando o usuário escolhe e salva uma opção. Ela foi aplicada no
-banco local; as contagens de contas (4) e preferências (3) permaneceram iguais.
+de execução única e não altera os dados de progresso. Contas existentes mantêm
+um avatar padrão; as preferências existentes só passam a ser consideradas
+configuradas quando o usuário escolhe e salva uma opção. Se qualquer uma das
+colunas já existir, não execute o arquivo inteiro; confira e aplique apenas a
+alteração que estiver faltando.
 
 ## Configuração local
 
